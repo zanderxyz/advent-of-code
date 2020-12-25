@@ -68,7 +68,7 @@ fn part1(input: Input) Answer {
 fn part2(input: Input) Answer {
     var length = input.items.len;
 
-    var paths = ArrayList(Answer).init(input.allocator);
+    var paths = std.ArrayList(Answer).init(input.allocator);
     paths.ensureCapacity(length) catch unreachable;
     defer paths.deinit();
 
