@@ -4,13 +4,13 @@ on:
   push:
     branches: [ master ]
     paths:
-      - .github
+      - .github/workflows/2020.yml
       - 2020/*.zig
 
   pull_request:
     branches: [ master ]
     paths:
-      - .github
+      - .github/workflows/2020.yml
       - 2020/*.zig
 
 jobs:
