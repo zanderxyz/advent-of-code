@@ -14,11 +14,7 @@ const Input = struct {
     fn deinit(self: *Input) void {
         var iterator = self.map.iterator();
         while (iterator.next()) |entry| {
-            // TODO: Each of these commented lines causes crash. How do I free the keys of the map?
-            // self.allocator.free(entry.key);
-            for (entry.value) |bag_count| {
-                // self.allocator.free(bag_count.color);
-            }
+            self.allocator.free(entry.value);
         }
         self.map.deinit();
     }
