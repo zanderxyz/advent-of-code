@@ -15,7 +15,6 @@ pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
     var input = try parseInput(&alloc.allocator, INPUT_FILE);
-    defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
 }
@@ -84,7 +83,6 @@ test "examples" {
     var alloc = std.testing.allocator;
     const test_input = @embedFile("inputs/test_day25.txt");
     var input = try parseInput(alloc, test_input);
-    defer input.deinit();
 
     expect(part1(input) == 14897079);
 }
