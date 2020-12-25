@@ -26,19 +26,14 @@ const Input = struct {
     }
 
     fn deinit(self: *Input) void {
-        // for (self.recipes) |recipe| {
-        //     for (recipe.ingredients) |ingredient| {
-        //         self.allocator.free(ingredient);
-        //     }
-        //     for (recipe.allergens) |allergen| {
-        //         self.allocator.free(allergen);
-        //     }
-        // }
+        for (self.recipes) |recipe| {
+            self.allocator.free(recipe.ingredients);
+            self.allocator.free(recipe.allergens);
+        }
         self.allocator.free(self.recipes);
     }
 };
 
-// TODO: Figure out the correct way to use these string hash maps without leaking memory
 const Possibles = std.StringHashMap(Allergens); // Key = Ingredient
 const IngredientCount = std.StringHashMap(usize); // Key = Ingredient
 const Allergens = std.StringHashMap(void); // Key = Allergen
@@ -157,6 +152,7 @@ const Logic = struct {
         self.possibles.deinit();
         self.solution.deinit();
     }
+
     fn countSafe(self: Self) usize {
         var count: usize = 0;
         var iterator = self.ingredients.iterator();
@@ -247,26 +243,16 @@ fn part2(input: Input) []const u8 {
     std.sort.sort(Pair, answers.items, {}, comptime lexographicByAllergen(u8));
 
     var ingredients = std.ArrayList(Ingredient).init(input.allocator);
-    defer {
-        for (ingredients.items) |ing| {
-            input.allocator.free(ing);
-        }
-        ingredients.deinit();
-
-        // for (answers.items) |pair| {
-        //     input.allocator.free(pair.left);
-        //     input.allocator.free(pair.right);
-        // }
-    }
 
     // Create a slice of ingredients, in order
     for (answers.items) |pair| {
         ingredients.append(pair.left) catch unreachable;
     }
+    const ingredients_slice = ingredients.toOwnedSlice();
+    defer input.allocator.free(ingredients_slice);
 
     // Join to the answer
-    var answer = std.mem.join(input.allocator, ",", ingredients.toOwnedSlice()) catch unreachable;
-
+    var answer = std.mem.join(input.allocator, ",", ingredients_slice) catch unreachable;
     return answer;
 }
 
@@ -290,6 +276,7 @@ test "examples" {
     defer input.deinit();
 
     expect(part1(input) == 5);
+
     const answer2 = part2(input);
     defer alloc.free(answer2);
     expect(std.mem.eql(u8, answer2, "mxmxvkd,sqjhc,fvjkl"));
