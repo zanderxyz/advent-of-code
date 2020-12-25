@@ -93,7 +93,7 @@ fn part2(input: Input) Answer {
     while (found < input.buses.len) {
         time += jump;
 
-        const bus = input.buses[i];
+        const bus = input.buses[found];
         if (time % bus.id == bus.mod) {
             jump *= bus.id;
             found += 1;

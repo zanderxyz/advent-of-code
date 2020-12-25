@@ -215,7 +215,7 @@ pub fn main() !void {
 }
 
 fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
-    var result = ArrayList(Instruction).init(allocator);
+    var result = std.ArrayList(Instruction).init(allocator);
     errdefer result.deinit();
 
     var instructions = std.mem.tokenize(input, "\n");
