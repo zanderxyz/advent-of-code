@@ -1,14 +1,16 @@
-name: AoC 2020
+name: 2020
 
 on:
   push:
     branches: [ master ]
     paths:
+      - .github
       - 2020/*.zig
 
   pull_request:
     branches: [ master ]
     paths:
+      - .github
       - 2020/*.zig
 
 jobs:
