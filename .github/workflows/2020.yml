@@ -95,6 +95,8 @@ jobs:
     - name: Day 22
       run: zig test 2020/day22.zig
 
+    # Increase the stack limit for day 23
+    - run: ulimit -s hard
     - name: Day 23
       run: zig test 2020/day23.zig
       
