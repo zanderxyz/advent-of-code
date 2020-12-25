@@ -1,0 +1,116 @@
+name: AoC 2020
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 2020/*.zig
+
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 2020/*.zig
+
+env:
+  year: 2020
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Set up Zig
+      uses: goto-bus-stop/setup-zig@v1
+
+    - name: Day 1
+      run: zig test ${{year}}/day01.zig
+
+    - name: Day 2
+      run: zig test ${{year}}/day02.zig
+      
+    - name: Day 3
+      run: zig test ${{year}}/day03.zig
+      
+    - name: Day 4
+      run: zig test ${{year}}/day04.zig
+      
+    - name: Day 5
+      run: zig test ${{year}}/day05.zig
+      
+    - name: Day 6
+      run: zig test ${{year}}/day06.zig
+      
+    - name: Day 7
+      run: zig test ${{year}}/day07.zig
+      
+    - name: Day 8
+      run: zig test ${{year}}/day08.zig
+      
+    - name: Day 9
+      run: zig test ${{year}}/day09.zig
+      
+    - name: Day 10
+      run: zig test ${{year}}/day10.zig
+      
+    - name: Day 11
+      run: zig test ${{year}}/day11.zig
+      
+    - name: Day 12
+      run: zig test ${{year}}/day12.zig
+      
+    - name: Day 13
+      run: zig test ${{year}}/day13.zig
+      
+    - name: Day 14
+      run: zig test ${{year}}/day14.zig
+      
+    - name: Day 15
+      run: zig test ${{year}}/day15.zig
+      
+    - name: Day 16
+      run: zig test ${{year}}/day16.zig
+      
+    - name: Day 17
+      run: zig test ${{year}}/day17.zig
+      
+    - name: Day 18
+      run: zig test ${{year}}/day18.zig
+      
+    - name: Day 19
+      run: zig test ${{year}}/day19.zig
+      
+    - name: Day 20
+      run: zig test ${{year}}/day20.zig
+      
+    - name: Day 21
+      run: zig test ${{year}}/day21.zig
+      
+    - name: Day 22
+      run: zig test ${{year}}/day22.zig
+
+    - name: Day 23
+      run: zig test ${{year}}/day23.zig
+      
+    - name: Day 24
+      run: zig test ${{year}}/day24.zig
+      
+    - name: Day 25
+      run: zig test ${{year}}/day25.zig
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Zig
+        uses: goto-bus-stop/setup-zig@v1
+
+      - name: Check formatting
+        run: zig fmt --check ${{year}}/*.zig
