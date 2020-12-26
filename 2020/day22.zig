@@ -116,8 +116,12 @@ fn Game(comptime MAX: usize) type {
                     var my_deck_copy = self.my_deck.copy(card1);
                     var your_deck_copy = self.your_deck.copy(card2);
 
-                    var game = Game(MAX).newWithDecks(self.allocator, my_deck_copy, your_deck_copy);
-                    winner = game.play(mode, game_num + 1);
+                    if (my_deck_copy.max() > your_deck_copy.max()) {
+                        winner = .one;
+                    } else {
+                        var game = Game(MAX).newWithDecks(self.allocator, my_deck_copy, your_deck_copy);
+                        winner = game.play(mode, game_num + 1);
+                    }
                 } else {
                     winner = if (card1 > card2) .one else .two;
                 }
@@ -214,6 +218,10 @@ fn Deck(comptime MAX: usize) type {
         fn copy(self: Self, up_to: Card) Self {
             var cards: []const Card = self.cards[self.top .. self.top + up_to];
             return Self.new(cards);
+        }
+
+        fn max(self: Self) Card {
+            return std.mem.max(Card, &self.cards);
         }
 
         fn state(self: Self, allocator: *std.mem.Allocator) []u8 {
