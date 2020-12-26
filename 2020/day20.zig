@@ -37,9 +37,9 @@ const Tile = struct {
     }
 
     fn deinitData(self: *Tile) void {
-        for (self.data) |row| {
-            self.allocator.free(row);
-        }
+        // for (self.data) |row| {
+        //     self.allocator.free(row);
+        // }
         self.allocator.free(self.data);
     }
 
@@ -398,10 +398,10 @@ const Graph = struct {
             false => 2749,
         };
 
-        print("Starting arrange with {}\n", .{corner});
+        // print("Starting arrange with {}\n", .{corner});
 
         var corner_tile = self.tiles.get(corner).?;
-        corner_tile.show();
+        // corner_tile.show();
 
         // Trial and error:
         if (is_test) {
@@ -426,21 +426,21 @@ const Graph = struct {
             const tile_id = queue.orderedRemove(0);
             const links = self.links.get(tile_id).?;
             position = positions.get(tile_id).?;
-            print("Found tile {} with {} links and {}\n", .{ tile_id, links.len, position });
+            // print("Found tile {} with {} links and {}\n", .{ tile_id, links.len, position });
             for (links) |linked_tile_id| {
                 if (visited.get(linked_tile_id) == null) {
-                    print(" -> Attempting match for new {}\n", .{linked_tile_id});
+                    // print(" -> Attempting match for new {}\n", .{linked_tile_id});
                     const offset = try self.forceMatch(tile_id, linked_tile_id);
-                    print(" -> Found orientation for {}: {}\n", .{ linked_tile_id, offset });
+                    // print(" -> Found orientation for {}: {}\n", .{ linked_tile_id, offset });
                     const new_position = position.add(offset);
                     try positions.put(linked_tile_id, new_position);
                     grid.set(new_position, linked_tile_id);
-                    print(" -> Found position for {}: {}\n", .{ linked_tile_id, new_position });
+                    // print(" -> Found position for {}: {}\n", .{ linked_tile_id, new_position });
                     try queue.append(linked_tile_id);
                     try visited.put(linked_tile_id, {});
-                    print(" -> Added {} to queue\n", .{linked_tile_id});
+                    // print(" -> Added {} to queue\n", .{linked_tile_id});
                 } else {
-                    print(" -> Already visited {}\n", .{linked_tile_id});
+                    // print(" -> Already visited {}\n", .{linked_tile_id});
                 }
             }
         }
@@ -448,7 +448,7 @@ const Graph = struct {
 
     fn forceMatch(self: *Self, left_id: usize, right_id: usize) !Offset {
         const left = self.tiles.get(left_id).?;
-        left.show();
+        // left.show();
         var right = self.tiles.get(right_id).?;
         return self.forceMatchTiles(left, &right);
     }
@@ -680,10 +680,6 @@ fn part2(input: Input, is_test: bool) Answer {
     defer graph.deinit();
 
     var iterator = graph.links.iterator();
-    while (iterator.next()) |entry| {
-        print("Tile {}\n", .{entry.key});
-        print("Links: {}\n", .{entry.value.len});
-    }
 
     // Arrange into a grid
     var grid = Grid.init(input.allocator, input);
@@ -691,13 +687,13 @@ fn part2(input: Input, is_test: bool) Answer {
 
     graph.arrange(&grid, is_test) catch unreachable;
 
-    grid.show();
+    // grid.show();
 
     // Combine to an image
     var image = Image.init(input.allocator, graph.tiles, grid);
     defer image.deinit();
 
-    image.show();
+    // image.show();
 
     var monsters: usize = image.countMonsters();
 
@@ -713,10 +709,10 @@ fn part2(input: Input, is_test: bool) Answer {
     }
 
     var cells: usize = image.countTrue();
-    print("Cells: {}\n", .{cells});
-    print("Monsters: {}\n", .{monsters});
+    // print("Cells: {}\n", .{cells});
+    // print("Monsters: {}\n", .{monsters});
     const roughness = cells - 15 * monsters;
-    print("Roughness: {}\n", .{roughness});
+    // print("Roughness: {}\n", .{roughness});
 
     return roughness;
 }
