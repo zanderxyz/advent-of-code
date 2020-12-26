@@ -96,8 +96,20 @@ test "example" {
     const input = try parseInput(alloc, test_input);
     defer alloc.free(input);
 
-    expect(part1(input, 5) == 127);
-    expect(part2(input, 127) == 62);
+    const first = part1(input, 5);
+    expect(first == 127);
+    expect(part2(input, first) == 62);
+}
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day09.txt");
+    const input = try parseInput(alloc, test_input);
+    defer alloc.free(input);
+
+    const first = part1(input, 25);
+    expect(first == 1124361034);
+    expect(part2(input, first) == 129444555);
 }
 
 test "is valid" {

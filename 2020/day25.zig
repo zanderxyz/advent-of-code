@@ -86,3 +86,11 @@ test "examples" {
 
     expect(part1(input) == 14897079);
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day25.txt");
+    var input = try parseInput(alloc, test_input);
+
+    expect(part1(input) == 9177528);
+}

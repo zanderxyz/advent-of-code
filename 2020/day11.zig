@@ -289,3 +289,15 @@ test "example" {
     defer input2.deinit();
     expect(part2(alloc, &input2) == 26);
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day11.txt");
+    var input = try parseInput(alloc, test_input);
+    defer input.deinit();
+    expect(part1(alloc, &input) == 2361);
+
+    var input2 = try parseInput(alloc, test_input);
+    defer input2.deinit();
+    expect(part2(alloc, &input2) == 2119);
+}

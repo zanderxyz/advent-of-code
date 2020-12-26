@@ -116,3 +116,13 @@ test "get seat id" {
     expect(decodeSeat("FFFBBBFRRR").id == 119);
     expect(decodeSeat("BBFFBBFRLL").id == 820);
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day05.txt");
+    var input = try parseInput(alloc, test_input);
+    defer input.deinit();
+
+    expect(part1(input) == 885);
+    expect(part2(input) == 623);
+}

@@ -285,3 +285,16 @@ test "examples" {
     expect(part1(&grid, &input) == 10);
     expect(part2(&grid) == 2208);
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day24.txt");
+    var input = try parseInput(alloc, test_input);
+    defer input.deinit();
+
+    var grid = HexGrid.init(input.allocator);
+    defer grid.deinit();
+
+    expect(part1(&grid, &input) == 485);
+    expect(part2(&grid) == 3933);
+}

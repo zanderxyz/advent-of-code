@@ -359,3 +359,13 @@ test "example infinite" {
     var game = Game(MAX_STACK).new(input);
     expect(game.play(.recursive, 1) == .one);
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day22.txt");
+    var input = try parseInput(alloc, test_input);
+    defer input.deinit();
+
+    expect(part1(input) == 33010);
+    expect(part2(input) == 32769);
+}

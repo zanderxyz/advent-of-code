@@ -281,3 +281,16 @@ test "examples" {
     defer alloc.free(answer2);
     expect(std.mem.eql(u8, answer2, "mxmxvkd,sqjhc,fvjkl"));
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day21.txt");
+    var input = try parseInput(alloc, test_input);
+    defer input.deinit();
+
+    expect(part1(input) == 2075);
+
+    const answer2 = part2(input);
+    defer alloc.free(answer2);
+    expect(std.mem.eql(u8, answer2, "zfcqk,mdtvbb,ggdbl,frpvd,mgczn,zsfzq,kdqls,kktsjbh"));
+}

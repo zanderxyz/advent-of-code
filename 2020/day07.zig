@@ -149,3 +149,13 @@ test "example" {
     expect(part1(input) == 4);
     expect(part2(input) == 32);
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day07.txt");
+    var input = try parseInput(alloc, test_input);
+    defer input.deinit();
+
+    expect(part1(input) == 226);
+    expect(part2(input) == 9569);
+}

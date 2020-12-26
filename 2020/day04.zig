@@ -173,3 +173,13 @@ test "example" {
 
     expect(part1(input) == 2);
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day04.txt");
+    const input = try parseInput(alloc, test_input);
+    defer input.deinit();
+
+    expect(part1(input) == 170);
+    expect(part2(input) == 103);
+}

@@ -84,3 +84,13 @@ test "examples" {
     expect(part1(input) == 436);
     expect(part2(input) == 175594);
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day15.txt");
+    var input = try parseInput(alloc, test_input);
+    defer input.deinit();
+
+    expect(part1(input) == 700);
+    expect(part2(input) == 51358);
+}

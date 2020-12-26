@@ -197,3 +197,13 @@ test "example 2" {
 
     expect(part2(&input) == 208);
 }
+
+test "answers" {
+    var alloc = std.testing.allocator;
+    const test_input = @embedFile("inputs/day14.txt");
+    var input = try parseInput(alloc, test_input);
+    defer input.deinit();
+
+    expect(part1(&input) == 11179633149677);
+    expect(part2(&input) == 4822600194774);
+}
