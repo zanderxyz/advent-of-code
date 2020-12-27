@@ -1,4 +1,3 @@
-// This is full of memory leaks
 // TODO: Rewrite using a single slice rather than a slice of slices
 
 const std = @import("std");
@@ -277,8 +276,10 @@ const Input = struct {
 
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
+    var arena = std.heap.ArenaAllocator.init(&alloc.allocator);
+    defer arena.deinit();
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(&arena.allocator, INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
@@ -719,8 +720,11 @@ fn part2(input: Input, is_test: bool) Answer {
 
 test "examples" {
     var alloc = std.testing.allocator;
+    var arena = std.heap.ArenaAllocator.init(alloc);
+    defer arena.deinit();
+
     const test_input = @embedFile("inputs/test_day20.txt");
-    var input = try parseInput(alloc, test_input);
+    var input = try parseInput(&arena.allocator, test_input);
     defer input.deinit();
 
     expect(part1(input) == 20899048083289);
@@ -729,8 +733,11 @@ test "examples" {
 
 test "answers" {
     var alloc = std.testing.allocator;
+    var arena = std.heap.ArenaAllocator.init(alloc);
+    defer arena.deinit();
+
     const test_input = @embedFile("inputs/day20.txt");
-    var input = try parseInput(alloc, test_input);
+    var input = try parseInput(&arena.allocator, test_input);
     defer input.deinit();
 
     expect(part1(input) == 11788777383197);
