@@ -32,9 +32,7 @@ pub fn part2(input: &Input) -> usize {
         .numbers
         .iter()
         .tuple_windows()
-        .map(|(a, b, c)| a + b + c)
-        .tuple_windows()
-        .filter(|&(a, b)| b > a)
+        .filter(|&(a, _b, _c, d)| d > a)
         .count()
 }
 
