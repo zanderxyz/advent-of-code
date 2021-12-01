@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 itertools = "0.10.1"
+
+[profile.dev.package."*"]
+opt-level = 3
