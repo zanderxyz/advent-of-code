@@ -18,11 +18,11 @@ struct Board {
     numbers_data: HashMap<usize, [usize; 2]>,
     // There are 10 lines in the board: 5 horizontal and 5 vertical
     // We track the number of filled entries in each line
-    found_per_line: [usize; 10],
+    found_count_per_line: [usize; 10],
     // Keep track of the numbers we have found
     found: HashSet<usize>,
-    // True iff the board is complete
-    pub complete: bool,
+    // True if the board is complete
+    pub is_complete: bool,
 }
 
 impl Board {
@@ -38,38 +38,52 @@ impl Board {
         Board {
             numbers_data,
             found: HashSet::new(),
-            found_per_line: [0; 10],
-            complete: false,
+            found_count_per_line: [0; 10],
+            is_complete: false,
         }
     }
 
     /// Attempt to find a number on the board
     /// Returns true if this number completes a line
-    pub fn find_and_check_complete(&mut self, number: usize) -> bool {
+    pub fn update_and_check_if_complete(&mut self, number: usize) -> bool {
+        // Ensure a number can only be found once per board
+        if self.found.contains(&number) {
+            return false;
+        }
+
         let lines = self.numbers_data.get(&number);
         match lines {
-            None => false,
-            Some([first, second]) => {
+            None => {
+                // This number is not on the board
+                false
+            }
+            Some(&[first, second]) => {
+                // This number is on the board, and is part of these two lines
+
                 // Add it to the found set
                 self.found.insert(number);
 
-                // Increment the found count for each line
-                // If we have completed a line, return true
-                self.found_per_line[*first] += 1;
-                if self.found_per_line[*first] == 5 {
-                    self.complete = true;
+                // If we have completed either line, return true
+                if self.update_line_and_check_if_complete(first) {
+                    self.is_complete = true;
                     return true;
                 }
-
-                self.found_per_line[*second] += 1;
-                if self.found_per_line[*second] == 5 {
-                    self.complete = true;
+                if self.update_line_and_check_if_complete(second) {
+                    self.is_complete = true;
                     return true;
                 }
 
                 false
             }
         }
+    }
+
+    fn update_line_and_check_if_complete(&mut self, line: usize) -> bool {
+        // Increment the found count for this line
+        self.found_count_per_line[line] += 1;
+
+        // If it has 5 items found, then it's complete
+        self.found_count_per_line[line] == 5
     }
 
     pub fn score(&self, number: usize) -> usize {
@@ -132,7 +146,7 @@ impl Input {
 fn part1(mut input: Input) -> usize {
     for number in input.numbers {
         for board in &mut input.boards {
-            if board.find_and_check_complete(number) {
+            if board.update_and_check_if_complete(number) {
                 // Return the score of the first board completed
                 return board.score(number);
             }
@@ -146,7 +160,7 @@ fn part2(mut input: Input) -> usize {
     let mut completed_boards: usize = 0;
     for number in input.numbers {
         for board in &mut input.boards {
-            if !board.complete && board.find_and_check_complete(number) {
+            if !board.is_complete && board.update_and_check_if_complete(number) {
                 completed_boards += 1;
                 if completed_boards == number_of_boards {
                     // Return the score of the final board completed
