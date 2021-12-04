@@ -30,7 +30,7 @@ impl FromStr for Action {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (dir_str, dist_str) = s.split_once(" ").expect("Missing whitespace");
 
-        let direction = str_to_direction(&dir_str).ok_or(ParseError::InvalidDirection)?;
+        let direction = str_to_direction(dir_str).ok_or(ParseError::InvalidDirection)?;
         let distance = dist_str
             .parse::<isize>()
             .map_err(|_| ParseError::InvalidDistance)?;
@@ -97,7 +97,7 @@ pub struct Action {
 }
 
 fn run_actions_on_submarine(
-    actions: &Vec<Action>,
+    actions: &[Action],
     update_submarine: fn(&mut Submarine, &Action),
 ) -> isize {
     let mut submarine = Submarine::new();
