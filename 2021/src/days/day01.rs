@@ -3,7 +3,7 @@ use itertools::Itertools;
 const INPUT: &str = include_str!("../../inputs/day01.txt");
 
 #[derive(Clone)]
-pub struct Input {
+struct Input {
     pub numbers: Vec<usize>,
 }
 
@@ -18,7 +18,7 @@ impl Input {
     }
 }
 
-pub fn part1(input: &Input) -> usize {
+fn part1(input: &Input) -> usize {
     input
         .numbers
         .iter()
@@ -27,7 +27,7 @@ pub fn part1(input: &Input) -> usize {
         .count()
 }
 
-pub fn part2(input: &Input) -> usize {
+fn part2(input: &Input) -> usize {
     input
         .numbers
         .iter()

@@ -3,7 +3,7 @@ use std::str::FromStr;
 const INPUT: &str = include_str!("../../inputs/day02.txt");
 
 #[derive(Clone)]
-pub struct Input {
+struct Input {
     pub actions: Vec<Action>,
 }
 
@@ -19,7 +19,7 @@ impl Input {
 }
 
 #[derive(Debug)]
-pub enum ParseError {
+enum ParseError {
     InvalidDirection,
     InvalidDistance,
 }
@@ -84,14 +84,14 @@ impl Submarine {
 }
 
 #[derive(Clone)]
-pub enum Direction {
+enum Direction {
     Forward,
     Down,
     Up,
 }
 
 #[derive(Clone)]
-pub struct Action {
+struct Action {
     pub direction: Direction,
     pub distance: isize,
 }
@@ -107,11 +107,11 @@ fn run_actions_on_submarine(
     submarine.position * submarine.depth
 }
 
-pub fn part1(input: &Input) -> isize {
+fn part1(input: &Input) -> isize {
     run_actions_on_submarine(&input.actions, |sub, action| sub.travel(action))
 }
 
-pub fn part2(input: &Input) -> isize {
+fn part2(input: &Input) -> isize {
     run_actions_on_submarine(&input.actions, |sub, action| sub.apply(action))
 }
 

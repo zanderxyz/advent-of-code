@@ -4,7 +4,7 @@ const INPUT: &str = include_str!("../../inputs/day03.txt");
 // Any excuse to use const generics
 // This type is parametrised over the length of each binary in the input file
 // In retrospect it would probably have been better to just use a Vec and pass the length as a second input parameter
-pub struct Input<const N: usize> {
+struct Input<const N: usize> {
     pub numbers: Vec<[bool; N]>,
 }
 
@@ -29,7 +29,7 @@ impl<const N: usize> Input<N> {
     }
 }
 
-pub fn part1<const N: usize>(input: &Input<N>) -> usize {
+fn part1<const N: usize>(input: &Input<N>) -> usize {
     let input_length = input.numbers.len();
 
     // Count the number of 1s in each column
@@ -62,7 +62,7 @@ pub fn part1<const N: usize>(input: &Input<N>) -> usize {
     gamma * epsilon
 }
 
-pub fn part2<const N: usize>(input: &Input<N>) -> usize {
+fn part2<const N: usize>(input: &Input<N>) -> usize {
     let oxygen_generator = filter_numbers(input.numbers.clone(), true);
     let co2_scrubber = filter_numbers(input.numbers.clone(), false);
 
