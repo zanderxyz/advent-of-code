@@ -75,12 +75,10 @@ fn filter_numbers<const N: usize>(numbers: Vec<[bool; N]>, more_ones_than_zeros:
     let mut current_input = numbers;
     while column < N {
         // Count the number of 1s in this column
-        let count = current_input.iter().fold(0usize, |mut count, &number| {
-            if number[column] {
-                count += 1;
-            }
-            count
-        });
+        let count = current_input
+            .iter()
+            .filter(|&number| number[column])
+            .count();
 
         // Work out the target count (half of the remaining size, rounded up)
         let target_count = if current_input.len() % 2 == 0 {
@@ -92,10 +90,7 @@ fn filter_numbers<const N: usize>(numbers: Vec<[bool; N]>, more_ones_than_zeros:
         let target = (count >= target_count) == more_ones_than_zeros;
 
         // Filter the existing input based on this target
-        current_input = current_input
-            .into_iter()
-            .filter(|&number| number[column] == target)
-            .collect();
+        current_input.retain(|number| number[column] == target);
 
         // If only one left, we are done
         if current_input.len() == 1 {
