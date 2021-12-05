@@ -100,7 +100,7 @@ impl Board {
 impl Input {
     pub fn new(input: &str) -> Input {
         lazy_static! {
-            static ref RE: Regex = Regex::new("([1-9]*[0-9]+)").unwrap();
+            static ref RE: Regex = Regex::new("(\\d+)").unwrap();
         }
         let mut input_iter = input.lines();
 

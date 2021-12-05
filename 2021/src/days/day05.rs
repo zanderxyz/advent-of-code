@@ -1,5 +1,4 @@
-use lazy_static::lazy_static;
-use regex::Regex;
+use serde_scan::scan;
 use std::cmp::{max, min};
 use std::collections::HashSet;
 
@@ -35,7 +34,7 @@ impl Line {
             Line::Vertical(x, from_row, to_row) => {
                 (from_row..=to_row).map(|y| Point { x, y }).collect()
             }
-            Line::Diagonal(_, _) => HashSet::new(),
+            Line::Diagonal(_, _) => HashSet::with_capacity(0),
         }
     }
 
@@ -64,7 +63,7 @@ impl Input {
         let lines = input
             .lines()
             .map(|line| {
-                let (from_x, from_y, to_x, to_y) = get_coords_from_string(line);
+                let (from_x, from_y, to_x, to_y) = scan!("{},{} -> {},{}" <- line).unwrap();
                 if from_x == to_x {
                     Line::Vertical(from_x, min(from_y, to_y), max(from_y, to_y))
                 } else if from_y == to_y {
@@ -82,25 +81,10 @@ impl Input {
     }
 }
 
-fn get_coords_from_string(line: &str) -> (isize, isize, isize, isize) {
-    lazy_static! {
-        static ref RE: Regex = Regex::new("(\\d+),(\\d+) -> (\\d+),(\\d+)").unwrap();
-    }
-
-    let captures = RE.captures(line).unwrap();
-    // Capture 0 is the whole string
-    let from_x = captures.get(1).unwrap().as_str().parse::<isize>().unwrap();
-    let from_y = captures.get(2).unwrap().as_str().parse::<isize>().unwrap();
-    let to_x = captures.get(3).unwrap().as_str().parse::<isize>().unwrap();
-    let to_y = captures.get(4).unwrap().as_str().parse::<isize>().unwrap();
-
-    (from_x, from_y, to_x, to_y)
-}
-
-fn count_intersections(input: &Input, get_points_for_line: fn(&Line) -> HashSet<Point>) -> usize {
+fn count_intersections(lines: &[Line], get_points_for_line: fn(&Line) -> HashSet<Point>) -> usize {
     let mut visited = HashSet::new();
     let mut intersections = HashSet::new();
-    for line in &input.lines {
+    for line in lines {
         for point in get_points_for_line(line) {
             if visited.contains(&point) && !intersections.contains(&point) {
                 intersections.insert(point);
@@ -113,11 +97,11 @@ fn count_intersections(input: &Input, get_points_for_line: fn(&Line) -> HashSet<
 }
 
 fn part1(input: &Input) -> usize {
-    count_intersections(input, Line::points_orthogonal)
+    count_intersections(&input.lines, Line::points_orthogonal)
 }
 
 fn part2(input: &Input) -> usize {
-    count_intersections(input, Line::points_all)
+    count_intersections(&input.lines, Line::points_all)
 }
 
 pub fn main() {
