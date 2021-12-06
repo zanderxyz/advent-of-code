@@ -1,6 +1,7 @@
 const INPUT: &str = include_str!("../../inputs/day06.txt");
 
 const NEW_TIMER: usize = 8;
+const AGE_AFTER_BIRTH: usize = 6;
 
 // Array where index = fish timer, value = number of fish with this timer
 type Fish = [usize; NEW_TIMER + 1];
@@ -37,19 +38,8 @@ fn tick(state: &mut Fish) {
 }
 
 fn rotate(state: &mut Fish) {
-    let previous = *state;
-    for (index, &value) in previous.iter().enumerate() {
-        let new_index = new_index(index);
-        state[index] -= value;
-        state[new_index] += value;
-    }
-}
-
-fn new_index(index: usize) -> usize {
-    match index {
-        0 => 6,
-        i => i - 1,
-    }
+    state.rotate_left(1);
+    state[AGE_AFTER_BIRTH] += state[NEW_TIMER];
 }
 
 fn add_new_fish(state: &mut Fish, new_fish: usize) {
