@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 itertools = "0.10.1"
 lazy_static = "1.4.0"
+num-digitize = "0.4.2"
 regex = "1.5.4"
 serde_scan = "0.4.1"
 

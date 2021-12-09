@@ -1,3 +1,5 @@
+use num_digitize::FromIterRadix;
+
 const INPUT: &str = include_str!("../../inputs/day03.txt");
 
 #[derive(Clone, Debug)]
@@ -29,7 +31,7 @@ impl<const N: usize> Input<N> {
     }
 }
 
-fn part1<const N: usize>(input: &Input<N>) -> usize {
+fn part1<const N: usize>(input: &Input<N>) -> i64 {
     let input_length = input.numbers.len();
 
     // Count the number of 1s in each column
@@ -57,19 +59,19 @@ fn part1<const N: usize>(input: &Input<N>) -> usize {
 
     let gamma = binary_to_integer(gamma_binary);
 
-    let mask = 2usize.pow(N.try_into().unwrap()) - 1;
+    let mask = 2i64.pow(N.try_into().unwrap()) - 1;
     let epsilon = mask - gamma;
     gamma * epsilon
 }
 
-fn part2<const N: usize>(input: &Input<N>) -> usize {
+fn part2<const N: usize>(input: &Input<N>) -> i64 {
     let oxygen_generator = filter_numbers(input.numbers.clone(), true);
     let co2_scrubber = filter_numbers(input.numbers.clone(), false);
 
     oxygen_generator * co2_scrubber
 }
 
-fn filter_numbers<const N: usize>(numbers: Vec<[bool; N]>, more_ones_than_zeros: bool) -> usize {
+fn filter_numbers<const N: usize>(numbers: Vec<[bool; N]>, more_ones_than_zeros: bool) -> i64 {
     // Iterate through columns
     let mut column: usize = 0;
     let mut current_input = numbers;
@@ -106,16 +108,10 @@ fn filter_numbers<const N: usize>(numbers: Vec<[bool; N]>, more_ones_than_zeros:
     binary_to_integer(*current_input.first().unwrap())
 }
 
-fn binary_to_integer<const N: usize>(binary: [bool; N]) -> usize {
-    binary
-        .into_iter()
-        .enumerate()
-        .fold(0usize, |mut acc, (i, value)| {
-            if value {
-                acc += 2usize.pow((N - (i + 1)).try_into().unwrap())
-            }
-            acc
-        })
+fn binary_to_integer<const N: usize>(binary: [bool; N]) -> i64 {
+    let digits = binary.into_iter().map(|b| if b { 1 } else { 0 });
+
+    usize::from_iter_radix(digits, 2)
 }
 
 pub fn main() {
