@@ -1,6 +1,7 @@
 use std::collections::{HashSet, VecDeque};
 
 use itertools::Itertools;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 const INPUT: &str = include_str!("../../inputs/day09.txt");
 
@@ -151,9 +152,12 @@ fn part1(input: &Input) -> (usize, Vec<Point>) {
 
 fn part2(input: &Input, low_points: &[Point]) -> usize {
     low_points
-        .iter()
+        // The DFS can be parallelised
+        .par_iter()
         .map(|low_point| input.grid.basin_size(low_point))
+        .collect::<Vec<usize>>()
         // Take the three largest basins, by inverting and taking the three smallest, then inverting again
+        .into_iter()
         .map(|size| -(size as isize))
         .k_smallest(3)
         .map(|size| (-size) as usize)
