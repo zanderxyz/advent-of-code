@@ -125,8 +125,8 @@ fn neighbouring_points(row: usize, col: usize, height: usize, width: usize) -> V
     .collect()
 }
 
-fn part1(input: &Input) -> Octopodes<WIDTH, HEIGHT> {
-    let mut octopodes = input.octopodes.clone();
+fn part1(input: Input) -> Octopodes<WIDTH, HEIGHT> {
+    let mut octopodes = input.octopodes;
     for _ in 0..100 {
         octopodes.tick();
     }
@@ -143,7 +143,7 @@ fn part2(mut octopodes: Octopodes<WIDTH, HEIGHT>) -> usize {
 
 pub fn main() {
     let input = Input::new(INPUT);
-    let octopodes = part1(&input);
+    let octopodes = part1(input);
     println!("Part 1: {}", octopodes.flashes);
     let answer2 = part2(octopodes);
     println!("Part 2: {}", answer2);
@@ -157,7 +157,7 @@ mod tests {
     #[test]
     pub fn examples() {
         let input = Input::new(TEST_INPUT);
-        let octopodes = part1(&input);
+        let octopodes = part1(input);
         assert_eq!(octopodes.flashes, 1656);
         assert_eq!(part2(octopodes), 195);
     }
@@ -165,7 +165,7 @@ mod tests {
     #[test]
     pub fn answers() {
         let input = Input::new(INPUT);
-        let octopodes = part1(&input);
+        let octopodes = part1(input);
         assert_eq!(octopodes.flashes, 1627);
         assert_eq!(part2(octopodes), 329);
     }
