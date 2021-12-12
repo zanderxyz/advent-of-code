@@ -35,7 +35,7 @@ impl<'a> Cave<'a> {
 
 #[derive(Clone)]
 struct Input<'a> {
-    pub adjacency: HashMap<Cave<'a>, Vec<Cave<'a>>>,
+    pub adjacency: Adjacency<'a>,
 }
 
 impl Input<'_> {
@@ -48,18 +48,15 @@ impl Input<'_> {
                 let to = Cave::new(to_str);
                 (from, to)
             })
-            .fold(
-                HashMap::new(),
-                |mut adjacency: HashMap<Cave, Vec<Cave>>, (from, to)| {
-                    if to != Cave::Start && from != Cave::End {
-                        adjacency.entry(from.clone()).or_default().push(to.clone());
-                    }
-                    if from != Cave::Start && to != Cave::End {
-                        adjacency.entry(to).or_default().push(from);
-                    }
-                    adjacency
-                },
-            );
+            .fold(HashMap::new(), |mut adjacency: Adjacency, (from, to)| {
+                if to != Cave::Start && from != Cave::End {
+                    adjacency.entry(from.clone()).or_default().push(to.clone());
+                }
+                if from != Cave::Start && to != Cave::End {
+                    adjacency.entry(to).or_default().push(from);
+                }
+                adjacency
+            });
         Input { adjacency }
     }
 }
@@ -72,7 +69,7 @@ struct Graph<'a> {
 }
 
 impl Graph<'_> {
-    pub fn new<'a>(adjacency: &'a HashMap<Cave, Vec<Cave>>) -> Graph<'a> {
+    pub fn new<'a>(adjacency: &'a Adjacency) -> Graph<'a> {
         Graph {
             adjacency,
             visits: HashMap::with_capacity(adjacency.len()),
@@ -80,19 +77,14 @@ impl Graph<'_> {
     }
 
     pub fn count_routes(&mut self, allow_revisit_one_small: bool) -> usize {
-        self.do_count_routes(Cave::Start, 0, allow_revisit_one_small)
+        self.count_dfs(Cave::Start, 0, allow_revisit_one_small)
     }
 
     fn count_visits(&self, cave: &Cave) -> usize {
         *self.visits.get(cave).unwrap_or(&0)
     }
 
-    fn do_count_routes(
-        &mut self,
-        start: Cave,
-        count: usize,
-        allow_revisit_one_small: bool,
-    ) -> usize {
+    fn count_dfs(&mut self, start: Cave, count: usize, allow_revisit_one_small: bool) -> usize {
         // If this is the end, then this path has completed and we can increment the current count
         if start == Cave::End {
             return count + 1;
@@ -111,10 +103,13 @@ impl Graph<'_> {
             if can_visit {
                 // If this is the first time we've made a second visit to this cave, then we no longer allow revisits
                 let this_is_second_visit = is_small && visits == 1;
+                let allow_revisit = allow_revisit_one_small && !this_is_second_visit;
+
                 // Increment the visit count
                 *self.visits.entry(cave.clone()).or_insert(0) += 1;
-                let allow_revisit = allow_revisit_one_small && !this_is_second_visit;
-                next_count = self.do_count_routes(cave.clone(), next_count, allow_revisit);
+
+                next_count = self.count_dfs(cave.clone(), next_count, allow_revisit);
+
                 // Decrement the visit count
                 *self.visits.entry(cave.clone()).or_insert(0) -= 1;
             }
@@ -124,10 +119,7 @@ impl Graph<'_> {
     }
 }
 
-fn count_routes_start(
-    adjacency: &HashMap<Cave, Vec<Cave>>,
-    allow_revisit_one_small: bool,
-) -> usize {
+fn count_routes_start(adjacency: &Adjacency, allow_revisit_one_small: bool) -> usize {
     let mut graph = Graph::new(adjacency);
     graph.count_routes(allow_revisit_one_small)
 }
