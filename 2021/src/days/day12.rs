@@ -84,6 +84,10 @@ impl Graph<'_> {
         *self.visits.get(cave).unwrap_or(&0)
     }
 
+    fn already_visited(&self, cave: &Cave) -> bool {
+        self.count_visits(cave) > 0
+    }
+
     fn count_dfs(&mut self, start: Cave, count: usize, allow_revisit_one_small: bool) -> usize {
         // If this is the end, then this path has completed and we can increment the current count
         if start == Cave::End {
@@ -96,13 +100,12 @@ impl Graph<'_> {
         for cave in self.adjacency.get(&start).unwrap() {
             // We can visit any non-small cave, or any non-visited small cave
             let is_small = cave.is_small();
-            let visits = self.count_visits(cave);
-            let already_visited = visits != 0;
+            let already_visited = self.already_visited(cave);
             // If `allow_revisit_one_small` is set, we can visit any cave
             let can_visit = !is_small || !already_visited || allow_revisit_one_small;
             if can_visit {
                 // If this is the first time we've made a second visit to this cave, then we no longer allow revisits
-                let this_is_second_visit = is_small && visits == 1;
+                let this_is_second_visit = is_small && already_visited;
                 let allow_revisit = allow_revisit_one_small && !this_is_second_visit;
 
                 // Increment the visit count
