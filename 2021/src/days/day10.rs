@@ -38,7 +38,7 @@ impl ParseResult {
             ParseResult::Incomplete(stack) => stack
                 .iter()
                 .rev()
-                .map(|c| completion_score(c))
+                .map(completion_score)
                 .reduce(|acc, score| acc * 5 + score),
         }
     }
