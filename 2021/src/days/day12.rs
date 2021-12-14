@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use serde_scan::scan;
 
+use crate::helpers::increment::Increment;
+
 const INPUT: &str = include_str!("../../inputs/day12.txt");
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -109,12 +111,12 @@ impl Graph<'_> {
                 let allow_revisit = allow_revisit_one_small && !this_is_second_visit;
 
                 // Increment the visit count
-                *self.visits.entry(cave.clone()).or_insert(0) += 1;
+                self.visits.increment(cave.clone(), 1);
 
                 next_count = self.count_dfs(cave.clone(), next_count, allow_revisit);
 
                 // Decrement the visit count
-                *self.visits.entry(cave.clone()).or_insert(0) -= 1;
+                self.visits.decrement(cave.clone(), 1);
             }
         }
 

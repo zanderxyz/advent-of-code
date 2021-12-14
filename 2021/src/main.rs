@@ -1,4 +1,5 @@
 mod days;
+mod helpers;
 
 fn main() {
     let day: usize = std::env::args()
@@ -23,6 +24,7 @@ fn main() {
         11 => days::day11::main(),
         12 => days::day12::main(),
         13 => days::day13::main(),
+        14 => days::day14::main(),
         _ => panic!("Solution missing for day {}", day),
     }
 }
