@@ -25,6 +25,7 @@ fn main() {
         12 => days::day12::main(),
         13 => days::day13::main(),
         14 => days::day14::main(),
+        15 => days::day15::main(),
         _ => panic!("Solution missing for day {}", day),
     }
 }
