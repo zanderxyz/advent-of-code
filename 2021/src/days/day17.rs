@@ -113,8 +113,8 @@ fn part2(input: &Input) -> usize {
 
     let mut hits = 0;
     for vy in min_y..=max_y {
-        // Start x at zero and keep increasing
-        for vx in 0.. {
+        // Start x at one and keep increasing
+        for vx in 1.. {
             let mut probe = Probe::new((vx, vy));
             match probe.take_shot(&input.target) {
                 Result::Hit => hits += 1,
