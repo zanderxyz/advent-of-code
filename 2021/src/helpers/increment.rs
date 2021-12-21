@@ -21,8 +21,8 @@ where
     }
 
     fn decrement_delete(&mut self, key: T, count: usize) {
-        match self.get(&key).unwrap() {
-            &x if x <= count => {
+        match *self.get(&key).unwrap() {
+            x if x <= count => {
                 self.remove(&key);
             }
             _ => *self.entry(key).or_insert(0) -= count,
