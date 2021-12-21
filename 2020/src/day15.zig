@@ -2,12 +2,12 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day15.txt");
+const INPUT_FILE = @embedFile("../inputs/day15.txt");
 
 const Answer = usize;
 const LastSeen = std.AutoHashMap(Answer, Answer);
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     numbers: []Answer,
 
     fn deinit(self: *Input) void {
@@ -18,18 +18,18 @@ const Input = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var result = std.ArrayList(Answer).init(allocator);
     errdefer result.deinit();
 
-    var numbers = std.mem.split(input, ",");
+    var numbers = std.mem.split(u8, input, ",");
     while (numbers.next()) |num| {
         const number = try std.fmt.parseInt(Answer, num, 10);
         try result.append(number);
@@ -77,20 +77,20 @@ fn part2(input: Input) Answer {
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day15.txt");
+    const test_input = @embedFile("../inputs/test_day15.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 436);
-    expect(part2(input) == 175594);
+    try expect(part1(input) == 436);
+    try expect(part2(input) == 175594);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day15.txt");
+    const test_input = @embedFile("../inputs/day15.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 700);
-    expect(part2(input) == 51358);
+    try expect(part1(input) == 700);
+    try expect(part2(input) == 51358);
 }

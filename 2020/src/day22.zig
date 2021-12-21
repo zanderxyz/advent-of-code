@@ -2,18 +2,18 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day22.txt");
+const INPUT_FILE = @embedFile("../inputs/day22.txt");
 
 const Answer = usize;
 
 const MAX_STACK = 1000;
 
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     cards1: []Card,
     cards2: []Card,
 
-    fn init(allocator: *std.mem.Allocator, cards1: []Card, cards2: []Card) Input {
+    fn init(allocator: std.mem.Allocator, cards1: []Card, cards2: []Card) Input {
         return Input{
             .allocator = allocator,
             .cards1 = cards1,
@@ -34,7 +34,7 @@ const Player = enum {
 
 fn Game(comptime MAX: usize) type {
     return struct {
-        allocator: *std.mem.Allocator,
+        allocator: std.mem.Allocator,
         my_deck: Deck(MAX),
         your_deck: Deck(MAX),
 
@@ -53,7 +53,7 @@ fn Game(comptime MAX: usize) type {
             };
         }
 
-        fn newWithDecks(allocator: *std.mem.Allocator, my_deck: Deck(MAX), your_deck: Deck(MAX)) Self {
+        fn newWithDecks(allocator: std.mem.Allocator, my_deck: Deck(MAX), your_deck: Deck(MAX)) Self {
             return Self{
                 .allocator = allocator,
                 .my_deck = my_deck,
@@ -78,7 +78,7 @@ fn Game(comptime MAX: usize) type {
             defer {
                 var iterator = visited.iterator();
                 while (iterator.next()) |entry| {
-                    self.allocator.free(entry.key);
+                    self.allocator.free(entry.key_ptr.*);
                 }
                 visited.deinit();
             }
@@ -158,14 +158,14 @@ fn Game(comptime MAX: usize) type {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var cards1 = std.ArrayList(Card).init(allocator);
     errdefer cards1.deinit();
 
@@ -174,7 +174,7 @@ fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
 
     var player = Player.one;
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     _ = lines.next(); // Skip the first player number
 
     while (lines.next()) |line| {
@@ -224,7 +224,7 @@ fn Deck(comptime MAX: usize) type {
             return std.mem.max(Card, &self.cards);
         }
 
-        fn state(self: Self, allocator: *std.mem.Allocator) []u8 {
+        fn state(self: Self, allocator: std.mem.Allocator) []u8 {
             const cards = self.cards[self.top..self.bottom];
             const string: [1][]const u8 = [_][]const u8{cards};
             return std.mem.join(allocator, " ", &string) catch unreachable;
@@ -261,9 +261,6 @@ fn Deck(comptime MAX: usize) type {
 
         fn score(self: Self) usize {
             var s: usize = 0;
-            var j: usize = 1;
-            var i: usize = self.bottom - 1;
-
             var k: usize = 1;
             while (k <= self.depth()) {
                 const card = self.cards[self.bottom - k];
@@ -282,50 +279,50 @@ test "deck" {
     var cards: [3]Card = [_]Card{ 1, 2, 3 };
     deck.add(&cards);
 
-    expect(deck.depth() == 3);
-    expect(deck.top == 0);
-    expect(deck.bottom == 3);
-    expect(deck.cards[0] == 1);
-    expect(deck.cards[1] == 2);
-    expect(deck.cards[2] == 3);
+    try expect(deck.depth() == 3);
+    try expect(deck.top == 0);
+    try expect(deck.bottom == 3);
+    try expect(deck.cards[0] == 1);
+    try expect(deck.cards[1] == 2);
+    try expect(deck.cards[2] == 3);
 
-    expect(deck.draw().? == 1);
-    expect(deck.depth() == 2);
-    expect(deck.top == 1);
-    expect(deck.bottom == 3);
+    try expect(deck.draw().? == 1);
+    try expect(deck.depth() == 2);
+    try expect(deck.top == 1);
+    try expect(deck.bottom == 3);
 
-    expect(deck.draw().? == 2);
-    expect(deck.depth() == 1);
-    expect(deck.top == 2);
-    expect(deck.bottom == 3);
+    try expect(deck.draw().? == 2);
+    try expect(deck.depth() == 1);
+    try expect(deck.top == 2);
+    try expect(deck.bottom == 3);
 
-    expect(deck.draw().? == 3);
-    expect(deck.depth() == 0);
-    expect(deck.top == 3);
-    expect(deck.bottom == 3);
+    try expect(deck.draw().? == 3);
+    try expect(deck.depth() == 0);
+    try expect(deck.top == 3);
+    try expect(deck.bottom == 3);
 
-    expect(deck.draw() == null);
-    expect(deck.depth() == 0);
+    try expect(deck.draw() == null);
+    try expect(deck.depth() == 0);
 
     deck.push(4);
-    expect(deck.depth() == 1);
-    expect(deck.top == 3);
-    expect(deck.bottom == 4);
-    expect(deck.cards[3] == 4);
+    try expect(deck.depth() == 1);
+    try expect(deck.top == 3);
+    try expect(deck.bottom == 4);
+    try expect(deck.cards[3] == 4);
 
-    expect(deck.draw().? == 4);
-    expect(deck.top == 4);
-    expect(deck.bottom == 4);
+    try expect(deck.draw().? == 4);
+    try expect(deck.top == 4);
+    try expect(deck.bottom == 4);
 
     deck.push(5);
     deck.push(6);
-    expect(deck.depth() == 2);
-    expect(deck.top == 4);
-    expect(deck.bottom == 6);
-    expect(deck.cards[4] == 5);
-    expect(deck.cards[5] == 6);
+    try expect(deck.depth() == 2);
+    try expect(deck.top == 4);
+    try expect(deck.bottom == 6);
+    try expect(deck.cards[4] == 5);
+    try expect(deck.cards[5] == 6);
 
-    expect(deck.score() == 16);
+    try expect(deck.score() == 16);
 }
 
 fn part1(input: Input) Answer {
@@ -342,30 +339,30 @@ fn part2(input: Input) Answer {
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day22.txt");
+    const test_input = @embedFile("../inputs/test_day22.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 306);
-    expect(part2(input) == 291);
+    try expect(part1(input) == 306);
+    try expect(part2(input) == 291);
 }
 
 test "example infinite" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day22_2.txt");
+    const test_input = @embedFile("../inputs/test_day22_2.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
     var game = Game(MAX_STACK).new(input);
-    expect(game.play(.recursive, 1) == .one);
+    try expect(game.play(.recursive, 1) == .one);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day22.txt");
+    const test_input = @embedFile("../inputs/day22.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 33010);
-    expect(part2(input) == 32769);
+    try expect(part1(input) == 33010);
+    try expect(part2(input) == 32769);
 }

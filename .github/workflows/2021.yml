@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
     paths:
-      - .github/workflows/2020.yml
+      - .github/workflows/2021.yml
       - 2021/**
 
 jobs:

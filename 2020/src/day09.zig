@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day09.txt");
+const INPUT_FILE = @embedFile("../inputs/day09.txt");
 
 const Answer = usize;
 const Input = []Answer;
@@ -10,7 +10,7 @@ const Input = []Answer;
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    const input = try parseInput(&alloc.allocator, INPUT_FILE);
+    const input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer alloc.allocator.free(input);
 
     const p1answer = part1(input, 25);
@@ -18,11 +18,11 @@ pub fn main() !void {
     print("Part 2: {}\n", .{part2(input, p1answer)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var result = std.ArrayList(Answer).init(allocator);
     errdefer result.deinit();
 
-    var instructions = std.mem.tokenize(input, "\n");
+    var instructions = std.mem.tokenize(u8, input, "\n");
     while (instructions.next()) |line| {
         const number = try std.fmt.parseInt(Answer, line, 10);
 
@@ -92,28 +92,28 @@ fn isValid(numbers: []const usize, number: usize) bool {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day09.txt");
+    const test_input = @embedFile("../inputs/test_day09.txt");
     const input = try parseInput(alloc, test_input);
     defer alloc.free(input);
 
     const first = part1(input, 5);
-    expect(first == 127);
-    expect(part2(input, first) == 62);
+    try expect(first == 127);
+    try expect(part2(input, first) == 62);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day09.txt");
+    const test_input = @embedFile("../inputs/day09.txt");
     const input = try parseInput(alloc, test_input);
     defer alloc.free(input);
 
     const first = part1(input, 25);
-    expect(first == 1124361034);
-    expect(part2(input, first) == 129444555);
+    try expect(first == 1124361034);
+    try expect(part2(input, first) == 129444555);
 }
 
 test "is valid" {
     const list: [5]usize = .{ 1, 2, 3, 4, 5 };
-    expect(isValid(list[0..5], 6) == true);
-    expect(isValid(list[0..5], 10) == false);
+    try expect(isValid(list[0..5], 6) == true);
+    try expect(isValid(list[0..5], 10) == false);
 }

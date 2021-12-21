@@ -2,16 +2,16 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day23.txt");
+const INPUT_FILE = @embedFile("../inputs/day23.txt");
 
 const Cup = usize;
 const Answer = usize;
 
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     cups: []Cup,
 
-    fn init(allocator: *std.mem.Allocator, cups: []Cup) Input {
+    fn init(allocator: std.mem.Allocator, cups: []Cup) Input {
         return Input{
             .allocator = allocator,
             .cups = cups,
@@ -123,18 +123,18 @@ fn Game(comptime MAX: usize) type {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var cups = std.ArrayList(Cup).init(allocator);
     errdefer cups.deinit();
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     const line = lines.next().?;
     for (line) |char| {
         const str: [1]u8 = [_]u8{char};
@@ -161,20 +161,20 @@ fn part2(input: Input) Answer {
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day23.txt");
+    const test_input = @embedFile("../inputs/test_day23.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 67384529);
-    expect(part2(input) == 149245887792);
+    try expect(part1(input) == 67384529);
+    try expect(part2(input) == 149245887792);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day23.txt");
+    const test_input = @embedFile("../inputs/day23.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 69425837);
-    expect(part2(input) == 218882971435);
+    try expect(part1(input) == 69425837);
+    try expect(part2(input) == 218882971435);
 }

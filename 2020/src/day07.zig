@@ -2,19 +2,19 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day07.txt");
+const INPUT_FILE = @embedFile("../inputs/day07.txt");
 const OUR_BAG_COLOR = "shiny gold";
 
 const Answer = usize;
 const Adjacency = std.StringHashMap(Contents);
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     map: Adjacency,
 
     fn deinit(self: *Input) void {
         var iterator = self.map.iterator();
         while (iterator.next()) |entry| {
-            self.allocator.free(entry.value);
+            self.allocator.free(entry.value_ptr.*);
         }
         self.map.deinit();
     }
@@ -62,18 +62,18 @@ const BagCount = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var result = Adjacency.init(allocator);
     errdefer result.deinit();
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     while (lines.next()) |line| {
         const rule = try decodeRule(allocator, line);
         try result.put(rule.color, rule.contains);
@@ -85,12 +85,12 @@ fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
     };
 }
 
-fn decodeRule(allocator: *std.mem.Allocator, line: []const u8) !Rule {
+fn decodeRule(allocator: std.mem.Allocator, line: []const u8) !Rule {
     var contents = std.ArrayList(BagCount).init(allocator);
     errdefer contents.deinit();
 
     // muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.
-    var split_line = std.mem.split(line, " bags contain ");
+    var split_line = std.mem.split(u8, line, " bags contain ");
     const color = split_line.next().?; // muted yellow
     const remainder = split_line.next().?; // 2 shiny gold bags, 9 faded blue bags
 
@@ -101,14 +101,14 @@ fn decodeRule(allocator: *std.mem.Allocator, line: []const u8) !Rule {
         };
     }
 
-    var bag_colors = std.mem.split(remainder, ", "); // 2 shiny gold bags
+    var bag_colors = std.mem.split(u8, remainder, ", "); // 2 shiny gold bags
     while (bag_colors.next()) |color_and_count| {
-        var split = std.mem.split(color_and_count, " ");
+        var split = std.mem.split(u8, color_and_count, " ");
         const count_string = split.next().?; // 2
         const count = try std.fmt.parseUnsigned(u8, count_string, 10);
 
         const bag_color = color_and_count[split.index.?..]; // shiny gold bags
-        var color_split = std.mem.split(bag_color, " bag");
+        var color_split = std.mem.split(u8, bag_color, " bag");
         const child_color = color_split.next().?;
 
         const bag_count = BagCount{
@@ -129,7 +129,7 @@ fn part1(input: Input) Answer {
     var iterator = input.map.iterator();
     // Iterate over every color. Key == color, Value == array of bags it contains
     while (iterator.next()) |rule| {
-        if (input.contains(rule.key, OUR_BAG_COLOR)) {
+        if (input.contains(rule.key_ptr.*, OUR_BAG_COLOR)) {
             count += 1;
         }
     }
@@ -142,20 +142,20 @@ fn part2(input: Input) Answer {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day07.txt");
+    const test_input = @embedFile("../inputs/test_day07.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 4);
-    expect(part2(input) == 32);
+    try expect(part1(input) == 4);
+    try expect(part2(input) == 32);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day07.txt");
+    const test_input = @embedFile("../inputs/day07.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 226);
-    expect(part2(input) == 9569);
+    try expect(part1(input) == 226);
+    try expect(part2(input) == 9569);
 }

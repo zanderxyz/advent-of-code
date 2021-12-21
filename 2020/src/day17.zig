@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day17.txt");
+const INPUT_FILE = @embedFile("../inputs/day17.txt");
 
 const Answer = usize;
 
@@ -16,7 +16,7 @@ fn Cells(comptime D: usize) type {
 
 fn Space(comptime D: usize) type {
     return struct {
-        allocator: *std.mem.Allocator,
+        allocator: std.mem.Allocator,
         cells: Cells(D),
 
         const Self = @This();
@@ -47,7 +47,7 @@ fn Space(comptime D: usize) type {
             defer self.cells.deinit();
         }
 
-        fn updateCell(self: *Self, next: *Cells(D), position: Position(D), active: bool, neighbours: usize) !void {
+        fn updateCell(next: *Cells(D), position: Position(D), active: bool, neighbours: usize) !void {
             if (active) {
                 // We use 3/4 instead of 2/3 as we counted the cell itself in neighbours
                 if (neighbours == 3 or neighbours == 4) {
@@ -82,15 +82,15 @@ fn Space(comptime D: usize) type {
                 .cells = self.cells,
             };
 
-            self.forEachNeighbour(position, &counter);
+            forEachNeighbour(position, &counter);
 
             return counter.neighbours;
         }
 
-        fn forEachNeighbour(self: Self, position: Position(D), func: anytype) void {
+        fn forEachNeighbour(position: Position(D), func: anytype) void {
             // 2d has 3^2== 9 neighbours including itself
             // 3d has 3^3 == 27 neighbours including itself
-            comptime const max: usize = std.math.pow(usize, 3, D);
+            comptime var max: usize = std.math.pow(usize, 3, D);
             comptime var i: usize = 0;
 
             inline while (i < max) : (i += 1) {
@@ -118,7 +118,7 @@ fn Space(comptime D: usize) type {
 
             var iterator = self.cells.iterator();
             while (iterator.next()) |entry| {
-                const position = entry.key;
+                const position = entry.key_ptr.*;
 
                 // Add every neighbour including the cell itself
                 const NeighbourVisit = struct {
@@ -133,7 +133,7 @@ fn Space(comptime D: usize) type {
                     .to_visit = to_visit,
                 };
 
-                self.forEachNeighbour(position, &visit);
+                forEachNeighbour(position, &visit);
 
                 to_visit = visit.to_visit;
             }
@@ -150,10 +150,10 @@ fn Space(comptime D: usize) type {
             var next = Cells(D).init(self.allocator);
             var visit = to_visit.iterator();
             while (visit.next()) |entry| {
-                const position = entry.key;
+                const position = entry.key_ptr.*;
                 const active = self.cells.contains(position);
                 const neighbours = self.countNeighbours(position);
-                try self.updateCell(&next, position, active, neighbours);
+                try updateCell(&next, position, active, neighbours);
             }
 
             // Finally copy the next state into the current one
@@ -175,10 +175,10 @@ fn Space(comptime D: usize) type {
 }
 
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     initial: [][]bool,
 
-    fn init(allocator: *std.mem.Allocator, initial: [][]bool) Input {
+    fn init(allocator: std.mem.Allocator, initial: [][]bool) Input {
         return Input{
             .allocator = allocator,
             .initial = initial,
@@ -196,18 +196,18 @@ const Input = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var initial = std.ArrayList([]bool).init(allocator);
     errdefer initial.deinit();
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     while (lines.next()) |line| {
         var row = std.ArrayList(bool).init(allocator);
         errdefer row.deinit();
@@ -246,20 +246,20 @@ fn part2(input: Input) !Answer {
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day17.txt");
+    const test_input = @embedFile("../inputs/test_day17.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect((try part1(input)) == 112);
-    expect((try part2(input)) == 848);
+    try expect((try part1(input)) == 112);
+    try expect((try part2(input)) == 848);
 }
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day17.txt");
+    const test_input = @embedFile("../inputs/day17.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect((try part1(input)) == 223);
-    expect((try part2(input)) == 1884);
+    try expect((try part1(input)) == 223);
+    try expect((try part2(input)) == 1884);
 }

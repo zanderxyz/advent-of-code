@@ -2,12 +2,12 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day14.txt");
+const INPUT_FILE = @embedFile("../inputs/day14.txt");
 
 const Answer = usize;
 const Address = u36;
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     instructions: []Instruction,
 
     fn deinit(self: *Input) void {
@@ -22,7 +22,7 @@ const Memory = struct {
 
     const Self = @This();
 
-    fn init(allocator: *std.mem.Allocator) Self {
+    fn init(allocator: std.mem.Allocator) Self {
         return Self{
             .contents = Contents.init(allocator),
         };
@@ -36,7 +36,7 @@ const Memory = struct {
         var s: Answer = 0;
         var iterator = self.contents.iterator();
         while (iterator.next()) |entry| {
-            s += entry.value;
+            s += entry.value_ptr.*;
         }
         return s;
     }
@@ -121,26 +121,26 @@ const Mask = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(&input)});
     print("Part 2: {}\n", .{part2(&input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var instructions = std.ArrayList(Instruction).init(allocator);
     errdefer instructions.deinit();
 
     var mask: Mask = undefined;
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     while (lines.next()) |line| {
         if (std.mem.eql(u8, line[0..4], "mask")) {
             mask = Mask.from(line[7..]);
         } else {
             const without_prefix = line[4..];
-            var split = std.mem.split(without_prefix, "] = ");
+            var split = std.mem.split(u8, without_prefix, "] = ");
             const register = try std.fmt.parseInt(Address, split.next().?, 10);
             const value = try std.fmt.parseInt(Address, split.next().?, 10);
 
@@ -182,28 +182,28 @@ fn part2(input: *Input) Answer {
 
 test "example 1" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day14.txt");
+    const test_input = @embedFile("../inputs/test_day14.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(&input) == 165);
+    try expect(part1(&input) == 165);
 }
 
 test "example 2" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day14_2.txt");
+    const test_input = @embedFile("../inputs/test_day14_2.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part2(&input) == 208);
+    try expect(part2(&input) == 208);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day14.txt");
+    const test_input = @embedFile("../inputs/day14.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(&input) == 11179633149677);
-    expect(part2(&input) == 4822600194774);
+    try expect(part1(&input) == 11179633149677);
+    try expect(part2(&input) == 4822600194774);
 }

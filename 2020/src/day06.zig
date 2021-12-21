@@ -2,13 +2,13 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day06.txt");
+const INPUT_FILE = @embedFile("../inputs/day06.txt");
 
 const Answer = usize;
 const Set = std.AutoHashMap(u8, void);
 const SetCount = std.AutoHashMap(u8, usize);
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     items: [][][]const u8,
 
     fn deinit(self: *@This()) void {
@@ -22,23 +22,23 @@ const Input = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var result = std.ArrayList([][]const u8).init(allocator);
     errdefer result.deinit();
 
-    var groups = std.mem.split(input, "\n\n");
+    var groups = std.mem.split(u8, input, "\n\n");
     while (groups.next()) |group| {
         var groupList = std.ArrayList([]const u8).init(allocator);
         errdefer groupList.deinit();
 
-        var people = std.mem.tokenize(group, "\n");
+        var people = std.mem.tokenize(u8, group, "\n");
         while (people.next()) |person| {
             try groupList.append(person);
         }
@@ -87,7 +87,7 @@ fn part2(input: Input) Answer {
         var iterator = set.iterator();
         while (iterator.next()) |entry| {
             // The answers everyone gave
-            if (entry.value == group_len) {
+            if (entry.value_ptr.* == group_len) {
                 count += 1;
             }
         }
@@ -98,20 +98,20 @@ fn part2(input: Input) Answer {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day06.txt");
+    const test_input = @embedFile("../inputs/test_day06.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 11);
-    expect(part2(input) == 6);
+    try expect(part1(input) == 11);
+    try expect(part2(input) == 6);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day06.txt");
+    const test_input = @embedFile("../inputs/day06.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 7283);
-    expect(part2(input) == 3520);
+    try expect(part1(input) == 7283);
+    try expect(part2(input) == 3520);
 }

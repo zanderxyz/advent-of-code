@@ -2,12 +2,12 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day05.txt");
+const INPUT_FILE = @embedFile("../inputs/day05.txt");
 
 const Answer = usize;
 const Occupied = std.AutoHashMap(Answer, void);
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     seats: []Seat,
 
     fn deinit(self: *Input) void {
@@ -24,18 +24,18 @@ const Seat = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var result = std.ArrayList(Seat).init(allocator);
     errdefer result.deinit();
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     while (lines.next()) |line| {
         const seat = decodeSeat(line);
         try result.append(seat);
@@ -111,18 +111,18 @@ fn decodeSeat(encoded: []const u8) Seat {
 }
 
 test "get seat id" {
-    expect(decodeSeat("FBFBBFFRLR").id == 357);
-    expect(decodeSeat("BFFFBBFRRR").id == 567);
-    expect(decodeSeat("FFFBBBFRRR").id == 119);
-    expect(decodeSeat("BBFFBBFRLL").id == 820);
+    try expect(decodeSeat("FBFBBFFRLR").id == 357);
+    try expect(decodeSeat("BFFFBBFRRR").id == 567);
+    try expect(decodeSeat("FFFBBBFRRR").id == 119);
+    try expect(decodeSeat("BBFFBBFRLL").id == 820);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day05.txt");
+    const test_input = @embedFile("../inputs/day05.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 885);
-    expect(part2(input) == 623);
+    try expect(part1(input) == 885);
+    try expect(part2(input) == 623);
 }

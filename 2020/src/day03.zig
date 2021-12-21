@@ -2,14 +2,14 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day03.txt");
+const INPUT_FILE = @embedFile("../inputs/day03.txt");
 
 const Answer = usize;
 
 const Input = struct {
     const Self = @This();
 
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     height: usize,
     width: usize,
     data: []bool,
@@ -33,18 +33,18 @@ const Input = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var result = std.ArrayList(bool).init(allocator);
     errdefer result.deinit();
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     var height: usize = 0;
     var width: usize = 0;
     while (lines.next()) |line| {
@@ -88,20 +88,20 @@ fn part2(input: Input) Answer {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day03.txt");
+    const test_input = @embedFile("../inputs/test_day03.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 7);
-    expect(part2(input) == 336);
+    try expect(part1(input) == 7);
+    try expect(part2(input) == 336);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day03.txt");
+    const test_input = @embedFile("../inputs/day03.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 189);
-    expect(part2(input) == 1718180100);
+    try expect(part1(input) == 189);
+    try expect(part2(input) == 1718180100);
 }

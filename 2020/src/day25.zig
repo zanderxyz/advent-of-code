@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day25.txt");
+const INPUT_FILE = @embedFile("../inputs/day25.txt");
 
 const Answer = usize;
 
@@ -12,15 +12,13 @@ const Input = struct {
 };
 
 pub fn main() !void {
-    var alloc = std.heap.GeneralPurposeAllocator(.{}){};
-
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(INPUT_FILE);
 
     print("Part 1: {}\n", .{part1(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
-    var lines = std.mem.tokenize(input, "\n");
+fn parseInput(input: []const u8) !Input {
+    var lines = std.mem.tokenize(u8, input, "\n");
 
     const card_public_key = try std.fmt.parseInt(usize, lines.next().?, 10);
     const door_public_key = try std.fmt.parseInt(usize, lines.next().?, 10);
@@ -60,11 +58,11 @@ fn crack(subject: usize, public: usize) usize {
 const SUBJECT = 7;
 
 test "transform" {
-    expect(transform(SUBJECT, 8) == 5764801);
+    try expect(transform(SUBJECT, 8) == 5764801);
 }
 
 test "crack" {
-    expect(crack(SUBJECT, 5764801) == 8);
+    try expect(crack(SUBJECT, 5764801) == 8);
 }
 
 fn part1(input: Input) Answer {
@@ -80,17 +78,15 @@ fn part1(input: Input) Answer {
 }
 
 test "examples" {
-    var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day25.txt");
-    var input = try parseInput(alloc, test_input);
+    const test_input = @embedFile("../inputs/test_day25.txt");
+    var input = try parseInput(test_input);
 
-    expect(part1(input) == 14897079);
+    try expect(part1(input) == 14897079);
 }
 
 test "answers" {
-    var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day25.txt");
-    var input = try parseInput(alloc, test_input);
+    const test_input = @embedFile("../inputs/day25.txt");
+    var input = try parseInput(test_input);
 
-    expect(part1(input) == 9177528);
+    try expect(part1(input) == 9177528);
 }

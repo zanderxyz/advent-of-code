@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day19.txt");
+const INPUT_FILE = @embedFile("../inputs/day19.txt");
 
 const Answer = usize;
 
@@ -52,11 +52,11 @@ const RuleData = union(enum) {
 };
 
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     rules: Rules,
     messages: []Message,
 
-    fn init(allocator: *std.mem.Allocator, rules: Rules, messages: []Message) Input {
+    fn init(allocator: std.mem.Allocator, rules: Rules, messages: []Message) Input {
         return Input{
             .allocator = allocator,
             .rules = rules,
@@ -67,7 +67,7 @@ const Input = struct {
     fn deinit(self: *Input) void {
         var iterator = self.rules.iterator();
         while (iterator.next()) |entry| {
-            var rule = entry.value;
+            var rule = entry.value_ptr.*;
             switch (rule.data) {
                 .literal => {},
                 .list => |list| {
@@ -104,7 +104,7 @@ const Input = struct {
         // A sequence is valid if ALL the sub sequences are valid
         var index: usize = 0;
         var index_end: usize = 0;
-        for (seq) |sub_rule_id, i| {
+        for (seq) |sub_rule_id| {
             index = index_end;
             const sub_rule = self.rules.get(sub_rule_id).?;
             // Slice up the message and move along by the length of the rule we are checking
@@ -125,14 +125,14 @@ const Input = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input, 8)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var rules = Rules.init(allocator);
     errdefer rules.deinit();
 
@@ -146,11 +146,11 @@ fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
 
     var state: ParserState = .rules;
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     while (lines.next()) |line| {
         switch (state) {
             .rules => {
-                var split = std.mem.split(line, ": ");
+                var split = std.mem.split(u8, line, ": ");
                 var rule_name = split.next().?;
                 const rule_number = std.fmt.parseInt(usize, rule_name, 10) catch {
                     state = .messages;
@@ -170,12 +170,12 @@ fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
                     var list = std.ArrayList([]usize).init(allocator);
                     errdefer list.deinit();
 
-                    var groups = std.mem.split(rule_content, " | ");
+                    var groups = std.mem.split(u8, rule_content, " | ");
                     while (groups.next()) |group_string| {
                         var group = std.ArrayList(usize).init(allocator);
                         errdefer group.deinit();
 
-                        var group_content = std.mem.split(group_string, " ");
+                        var group_content = std.mem.split(u8, group_string, " ");
 
                         while (group_content.next()) |string| {
                             const num = try std.fmt.parseInt(usize, string, 10);
@@ -219,7 +219,7 @@ fn part2(input: Input, comptime magic: usize) Answer {
     const rule42 = input.rules.get(42).?;
     const rule31 = input.rules.get(31).?;
 
-    for (input.messages) |message, index| {
+    for (input.messages) |message| {
         if (message.len % magic != 0) continue;
         // Divide message into blocks of 8 (5 for examples)
         // This is a magic number figured out from the input
@@ -262,29 +262,29 @@ fn part2(input: Input, comptime magic: usize) Answer {
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day19.txt");
+    const test_input = @embedFile("../inputs/test_day19.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 2);
+    try expect(part1(input) == 2);
 }
 
 test "examples 2" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day19_2.txt");
+    const test_input = @embedFile("../inputs/test_day19_2.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 3);
-    expect(part2(input, 5) == 12);
+    try expect(part1(input) == 3);
+    try expect(part2(input, 5) == 12);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day19.txt");
+    const test_input = @embedFile("../inputs/day19.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 187);
-    expect(part2(input, 8) == 392);
+    try expect(part1(input) == 187);
+    try expect(part2(input, 8) == 392);
 }

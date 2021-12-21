@@ -5,13 +5,13 @@ on:
     branches: [ master ]
     paths:
       - .github/workflows/2020.yml
-      - 2020/*.zig
+      - 2020/src/*.zig
 
   pull_request:
     branches: [ master ]
     paths:
       - .github/workflows/2020.yml
-      - 2020/*.zig
+      - 2020/src/*.zig
 
 jobs:
   build:
@@ -25,83 +25,83 @@ jobs:
     - name: Set up Zig
       uses: goto-bus-stop/setup-zig@v1
       with: 
-        version: 0.7.0
+        version: 0.9.0
 
     - name: Day 1
-      run: zig test 2020/day01.zig
+      run: zig test 2020/src/day01.zig
 
     - name: Day 2
-      run: zig test 2020/day02.zig
+      run: zig test 2020/src/day02.zig
       
     - name: Day 3
-      run: zig test 2020/day03.zig
+      run: zig test 2020/src/day03.zig
       
     - name: Day 4
-      run: zig test 2020/day04.zig
+      run: zig test 2020/src/day04.zig
       
     - name: Day 5
-      run: zig test 2020/day05.zig
+      run: zig test 2020/src/day05.zig
       
     - name: Day 6
-      run: zig test 2020/day06.zig
+      run: zig test 2020/src/day06.zig
       
     - name: Day 7
-      run: zig test 2020/day07.zig
+      run: zig test 2020/src/day07.zig
       
     - name: Day 8
-      run: zig test 2020/day08.zig
+      run: zig test 2020/src/day08.zig
       
     - name: Day 9
-      run: zig test 2020/day09.zig
+      run: zig test 2020/src/day09.zig
       
     - name: Day 10
-      run: zig test 2020/day10.zig
+      run: zig test 2020/src/day10.zig
       
     - name: Day 11
-      run: zig test 2020/day11.zig
+      run: zig test 2020/src/day11.zig
       
     - name: Day 12
-      run: zig test 2020/day12.zig
+      run: zig test 2020/src/day12.zig
       
     - name: Day 13
-      run: zig test 2020/day13.zig
+      run: zig test 2020/src/day13.zig
       
     - name: Day 14
-      run: zig test 2020/day14.zig
+      run: zig test 2020/src/day14.zig
       
     - name: Day 15
-      run: zig test 2020/day15.zig
+      run: zig test 2020/src/day15.zig
       
     - name: Day 16
-      run: zig test 2020/day16.zig
+      run: zig test 2020/src/day16.zig
       
     - name: Day 17
-      run: zig test 2020/day17.zig
+      run: zig test 2020/src/day17.zig
       
     - name: Day 18
-      run: zig test 2020/day18.zig
+      run: zig test 2020/src/day18.zig
       
     - name: Day 19
-      run: zig test 2020/day19.zig
+      run: zig test 2020/src/day19.zig
      
     - name: Day 20
-      run: zig test 2020/day20.zig
+      run: zig test 2020/src/day20.zig
       
     - name: Day 21
-      run: zig test 2020/day21.zig
+      run: zig test 2020/src/day21.zig
       
     - name: Day 22
-      run: zig test 2020/day22.zig
+      run: zig test 2020/src/day22.zig
 
     # Fails in CI as it uses more than the default stack size
     #- name: Day 23
-    #  run: zig test 2020/day23.zig
+    #  run: zig test 2020/src/day23.zig
       
     - name: Day 24
-      run: zig test 2020/day24.zig
+      run: zig test 2020/src/day24.zig
       
     - name: Day 25
-      run: zig test 2020/day25.zig
+      run: zig test 2020/src/day25.zig
 
   lint:
     name: Lint
@@ -114,7 +114,7 @@ jobs:
       - name: Set up Zig
         uses: goto-bus-stop/setup-zig@v1
         with: 
-          version: 0.7.0
+          version: 0.9.0
 
       - name: Check formatting
-        run: zig fmt --check 2020/*.zig
+        run: zig fmt --check 2020/src/*.zig

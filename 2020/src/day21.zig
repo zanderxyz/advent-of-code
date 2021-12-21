@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day21.txt");
+const INPUT_FILE = @embedFile("../inputs/day21.txt");
 
 const Answer = usize;
 
@@ -15,10 +15,10 @@ const Recipe = struct {
 };
 
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     recipes: []Recipe,
 
-    fn init(allocator: *std.mem.Allocator, recipes: []Recipe) Input {
+    fn init(allocator: std.mem.Allocator, recipes: []Recipe) Input {
         return Input{
             .allocator = allocator,
             .recipes = recipes,
@@ -40,14 +40,14 @@ const Allergens = std.StringHashMap(void); // Key = Allergen
 const Solution = std.StringHashMap(Allergen); // Key = Ingredient
 
 const Logic = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     possibles: Possibles,
     ingredients: IngredientCount,
     solution: Solution,
 
     const Self = @This();
 
-    fn init(allocator: *std.mem.Allocator, input: Input) !Self {
+    fn init(allocator: std.mem.Allocator, input: Input) !Self {
         var ingredients = IngredientCount.init(allocator);
         errdefer ingredients.deinit();
 
@@ -71,7 +71,7 @@ const Logic = struct {
         // Initially assume any allergen is possible for any ingredient
         var ingredient_iterator = ingredients.iterator();
         while (ingredient_iterator.next()) |entry| {
-            const ingredient = entry.key;
+            const ingredient = entry.key_ptr.*;
             try possibles.put(ingredient, try allergens.clone());
         }
 
@@ -80,7 +80,7 @@ const Logic = struct {
             for (recipe.allergens) |allergen| {
                 var ingredient_iter = ingredients.iterator();
                 next: while (ingredient_iter.next()) |entry| {
-                    const ingredient = entry.key;
+                    const ingredient = entry.key_ptr.*;
 
                     // Check if the ingredient is in the recipe
                     for (recipe.ingredients) |recipe_ingr| {
@@ -109,7 +109,7 @@ const Logic = struct {
         while (solution.count() < allergen_count) {
             var ingredient_iterator2 = ingredients.iterator();
             while (ingredient_iterator2.next()) |entry| {
-                const ingredient = entry.key;
+                const ingredient = entry.key_ptr.*;
 
                 // Fetch possible allergens for this ingredient
                 var poss_allergens = possibles.get(ingredient).?;
@@ -118,7 +118,7 @@ const Logic = struct {
                     var found: Allergen = undefined;
                     var poss_iter = poss_allergens.iterator();
                     while (poss_iter.next()) |allergen_entry| {
-                        const allergen = allergen_entry.key;
+                        const allergen = allergen_entry.key_ptr.*;
                         // Skip anything we have already solved
                         if (visited.get(allergen) == null) {
                             count += 1;
@@ -147,7 +147,7 @@ const Logic = struct {
         self.ingredients.deinit();
         var iterator = self.possibles.iterator();
         while (iterator.next()) |entry| {
-            entry.value.deinit();
+            entry.value_ptr.*.deinit();
         }
         self.possibles.deinit();
         self.solution.deinit();
@@ -157,10 +157,10 @@ const Logic = struct {
         var count: usize = 0;
         var iterator = self.ingredients.iterator();
         while (iterator.next()) |entry| {
-            const ingredient = entry.key;
+            const ingredient = entry.key_ptr.*;
             const possible_allergens = self.possibles.get(ingredient).?.count();
             if (possible_allergens == 0) {
-                count += entry.value;
+                count += entry.value_ptr.*;
             }
         }
         return count;
@@ -170,18 +170,18 @@ const Logic = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var recipes = std.ArrayList(Recipe).init(allocator);
     errdefer recipes.deinit();
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     while (lines.next()) |line| {
         var ingredients = std.ArrayList(Ingredient).init(allocator);
         errdefer ingredients.deinit();
@@ -189,16 +189,16 @@ fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
         var allergens = std.ArrayList(Allergen).init(allocator);
         errdefer allergens.deinit();
 
-        var split = std.mem.split(line[0 .. line.len - 1], " (contains ");
+        var split = std.mem.split(u8, line[0 .. line.len - 1], " (contains ");
         const ingredient_str = split.next().?;
         const allergen_str = split.next().?;
 
-        var ingredient_iter = std.mem.split(ingredient_str, " ");
+        var ingredient_iter = std.mem.split(u8, ingredient_str, " ");
         while (ingredient_iter.next()) |ingredient| {
             try ingredients.append(ingredient);
         }
 
-        var allergen_iter = std.mem.split(allergen_str, ", ");
+        var allergen_iter = std.mem.split(u8, allergen_str, ", ");
         while (allergen_iter.next()) |allergen| {
             try allergens.append(allergen);
         }
@@ -233,8 +233,8 @@ fn part2(input: Input) []const u8 {
     var solution_iter = logic.solution.iterator();
     while (solution_iter.next()) |entry| {
         const pair = Pair{
-            .left = entry.key, // ingredient
-            .right = entry.value, // allergen
+            .left = entry.key_ptr.*, // ingredient
+            .right = entry.value_ptr.*, // allergen
         };
         answers.append(pair) catch unreachable;
     }
@@ -271,26 +271,26 @@ fn lexographicByAllergen(comptime T: type) fn (void, Pair, Pair) bool {
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day21.txt");
+    const test_input = @embedFile("../inputs/test_day21.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 5);
+    try expect(part1(input) == 5);
 
     const answer2 = part2(input);
     defer alloc.free(answer2);
-    expect(std.mem.eql(u8, answer2, "mxmxvkd,sqjhc,fvjkl"));
+    try expect(std.mem.eql(u8, answer2, "mxmxvkd,sqjhc,fvjkl"));
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day21.txt");
+    const test_input = @embedFile("../inputs/day21.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 2075);
+    try expect(part1(input) == 2075);
 
     const answer2 = part2(input);
     defer alloc.free(answer2);
-    expect(std.mem.eql(u8, answer2, "zfcqk,mdtvbb,ggdbl,frpvd,mgczn,zsfzq,kdqls,kktsjbh"));
+    try expect(std.mem.eql(u8, answer2, "zfcqk,mdtvbb,ggdbl,frpvd,mgczn,zsfzq,kdqls,kktsjbh"));
 }

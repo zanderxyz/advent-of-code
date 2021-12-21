@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day11.txt");
+const INPUT_FILE = @embedFile("../inputs/day11.txt");
 
 const Answer = usize;
 const Input = Grid;
@@ -28,13 +28,13 @@ const Position = struct {
 const Spaces = std.AutoHashMap(Position, Space);
 
 const Grid = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     height: usize,
     width: usize,
     current: Spaces,
     next: Spaces,
 
-    fn init(allocator: *std.mem.Allocator) !Grid {
+    fn init(allocator: std.mem.Allocator) !Grid {
         return Grid{
             .allocator = allocator,
             .height = 0,
@@ -79,8 +79,8 @@ const Grid = struct {
     fn copyNewToOld(self: *Grid) void {
         var iterator = self.next.iterator();
         while (iterator.next()) |entry| {
-            const position = entry.key;
-            const seat = entry.value;
+            const position = entry.key_ptr.*;
+            const seat = entry.value_ptr.*;
 
             self.current.put(position, seat) catch unreachable;
         }
@@ -90,7 +90,7 @@ const Grid = struct {
         var count: usize = 0;
         var iterator = self.current.iterator();
         while (iterator.next()) |entry| {
-            const seat = entry.value;
+            const seat = entry.value_ptr.*;
 
             if (seat == .full) {
                 count += 1;
@@ -201,20 +201,20 @@ const Grid = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
-    print("Part 1: {}\n", .{part1(&alloc.allocator, &input)});
+    print("Part 1: {}\n", .{part1(alloc.allocator(), &input)});
 
-    var input2 = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input2 = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input2.deinit();
-    print("Part 2: {}\n", .{part2(&alloc.allocator, &input2)});
+    print("Part 2: {}\n", .{part2(alloc.allocator(), &input2)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var result = try Grid.init(allocator);
     errdefer result.deinit();
 
-    var instructions = std.mem.tokenize(input, "\n");
+    var instructions = std.mem.tokenize(u8, input, "\n");
     while (instructions.next()) |line| {
         result.addRow(line);
     }
@@ -222,17 +222,17 @@ fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
     return result;
 }
 
-fn part1(allocator: *std.mem.Allocator, grid: *Input) Answer {
+fn part1(grid: *Input) Answer {
     var changed: bool = true;
     while (changed) {
         changed = false;
 
         var iterator = grid.current.iterator();
         while (iterator.next()) |entry| {
-            const position = entry.key;
+            const position = entry.key_ptr.*;
             if (grid.shouldUpdateAdjacent(position)) {
                 changed = true;
-                switch (entry.value) {
+                switch (entry.value_ptr.*) {
                     .floor => {},
                     .empty => {
                         grid.next.put(position, .full) catch unreachable;
@@ -250,17 +250,17 @@ fn part1(allocator: *std.mem.Allocator, grid: *Input) Answer {
     return grid.countFull();
 }
 
-fn part2(allocator: *std.mem.Allocator, grid: *Input) Answer {
+fn part2(grid: *Input) Answer {
     var changed: bool = true;
     while (changed) {
         changed = false;
 
         var iterator = grid.current.iterator();
         while (iterator.next()) |entry| {
-            const position = entry.key;
+            const position = entry.key_ptr.*;
             if (grid.shouldUpdateVisible(position)) {
                 changed = true;
-                switch (entry.value) {
+                switch (entry.value_ptr.*) {
                     .floor => {},
                     .empty => {
                         grid.next.put(position, .full) catch unreachable;
@@ -280,24 +280,24 @@ fn part2(allocator: *std.mem.Allocator, grid: *Input) Answer {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day11.txt");
+    const test_input = @embedFile("../inputs/test_day11.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
-    expect(part1(alloc, &input) == 37);
+    try expect(part1(&input) == 37);
 
     var input2 = try parseInput(alloc, test_input);
     defer input2.deinit();
-    expect(part2(alloc, &input2) == 26);
+    try expect(part2(&input2) == 26);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day11.txt");
+    const test_input = @embedFile("../inputs/day11.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
-    expect(part1(alloc, &input) == 2361);
+    try expect(part1(&input) == 2361);
 
     var input2 = try parseInput(alloc, test_input);
     defer input2.deinit();
-    expect(part2(alloc, &input2) == 2119);
+    try expect(part2(&input2) == 2119);
 }

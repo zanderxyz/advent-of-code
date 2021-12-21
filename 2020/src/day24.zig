@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day24.txt");
+const INPUT_FILE = @embedFile("../inputs/day24.txt");
 
 const Answer = usize;
 
@@ -39,10 +39,10 @@ const Step = enum {
 const Path = []Step;
 
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     paths: []Path,
 
-    fn init(allocator: *std.mem.Allocator, paths: []Path) Input {
+    fn init(allocator: std.mem.Allocator, paths: []Path) Input {
         return Input{
             .allocator = allocator,
             .paths = paths,
@@ -60,7 +60,7 @@ const Input = struct {
 const Position = [2]isize;
 
 const HexGrid = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     cells: Cells,
 
     const Self = @This();
@@ -68,7 +68,7 @@ const HexGrid = struct {
 
     const all_directions: [6]Step = [_]Step{ Step.e, Step.w, Step.se, Step.sw, Step.ne, Step.nw };
 
-    fn init(allocator: *std.mem.Allocator) Self {
+    fn init(allocator: std.mem.Allocator) Self {
         var cells = Cells.init(allocator);
         return Self{
             .allocator = allocator,
@@ -109,7 +109,7 @@ const HexGrid = struct {
         return c;
     }
 
-    fn updateCell(self: *Self, next: *Cells, position: Position, active: bool, neighbours: usize) !void {
+    fn updateCell(next: *Cells, position: Position, active: bool, neighbours: usize) !void {
         if (active) {
             if (neighbours == 0 or neighbours > 2) {
                 // Moves to inactive
@@ -133,7 +133,7 @@ const HexGrid = struct {
 
         var iterator = self.cells.iterator();
         while (iterator.next()) |entry| {
-            const position = entry.key;
+            const position = entry.key_ptr.*;
             // Add every current active cell
             try to_visit.put(position, {});
 
@@ -158,10 +158,10 @@ const HexGrid = struct {
         var next = Cells.init(self.allocator);
         var visit = to_visit.iterator();
         while (visit.next()) |entry| {
-            const position = entry.key;
+            const position = entry.key_ptr.*;
             const active = self.cells.contains(position);
             const neighbours = self.countNeighbours(position);
-            try self.updateCell(&next, position, active, neighbours);
+            try updateCell(&next, position, active, neighbours);
         }
 
         // Finally copy the next state into the current one
@@ -188,42 +188,42 @@ test "hex grid" {
 
     const position: Position = [_]isize{ 0, 0 };
 
-    expect(grid.count() == 0);
-    expect(grid.countNeighbours(position) == 0);
+    try expect(grid.count() == 0);
+    try expect(grid.countNeighbours(position) == 0);
 
     // Flip one cell to the east
     var path: [1]Step = [_]Step{.e};
     grid.addPath(&path);
-    expect(grid.count() == 1);
-    expect(grid.countNeighbours(position) == 1);
+    try expect(grid.count() == 1);
+    try expect(grid.countNeighbours(position) == 1);
 
     // Flip the origin
     var path2: [2]Step = [_]Step{ .w, .e };
     grid.addPath(&path2);
-    expect(grid.count() == 2);
-    expect(grid.countNeighbours(position) == 1);
+    try expect(grid.count() == 2);
+    try expect(grid.countNeighbours(position) == 1);
 
     // Flip the origin back
     var path3: [3]Step = [_]Step{ .ne, .w, .se };
     grid.addPath(&path3);
-    expect(grid.count() == 1);
-    expect(grid.countNeighbours(position) == 1);
+    try expect(grid.count() == 1);
+    try expect(grid.countNeighbours(position) == 1);
 
     var path4: [1]Step = [_]Step{.w};
     grid.addPath(&path4);
-    expect(grid.count() == 2);
-    expect(grid.countNeighbours(position) == 2);
+    try expect(grid.count() == 2);
+    try expect(grid.countNeighbours(position) == 2);
 
     var path5: [1]Step = [_]Step{.sw};
     grid.addPath(&path5);
-    expect(grid.count() == 3);
-    expect(grid.countNeighbours(position) == 3);
+    try expect(grid.count() == 3);
+    try expect(grid.countNeighbours(position) == 3);
 }
 
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     var grid = HexGrid.init(input.allocator);
@@ -233,11 +233,11 @@ pub fn main() !void {
     print("Part 2: {}\n", .{part2(&grid)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var paths = std.ArrayList(Path).init(allocator);
     errdefer paths.deinit();
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     while (lines.next()) |line| {
         var steps = std.ArrayList(Step).init(allocator);
         errdefer steps.deinit();
@@ -275,26 +275,26 @@ fn part2(grid: *HexGrid) Answer {
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day24.txt");
+    const test_input = @embedFile("../inputs/test_day24.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
     var grid = HexGrid.init(input.allocator);
     defer grid.deinit();
 
-    expect(part1(&grid, &input) == 10);
-    expect(part2(&grid) == 2208);
+    try expect(part1(&grid, &input) == 10);
+    try expect(part2(&grid) == 2208);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day24.txt");
+    const test_input = @embedFile("../inputs/day24.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
     var grid = HexGrid.init(input.allocator);
     defer grid.deinit();
 
-    expect(part1(&grid, &input) == 485);
-    expect(part2(&grid) == 3933);
+    try expect(part1(&grid, &input) == 485);
+    try expect(part2(&grid) == 3933);
 }

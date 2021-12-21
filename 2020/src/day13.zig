@@ -2,11 +2,11 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day13.txt");
+const INPUT_FILE = @embedFile("../inputs/day13.txt");
 
 const Answer = usize;
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     time: Answer,
     buses: []Bus,
 
@@ -23,20 +23,20 @@ const Bus = struct {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    const input = try parseInput(&alloc.allocator, INPUT_FILE);
+    const input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var result = std.ArrayList(Bus).init(allocator);
     errdefer result.deinit();
 
-    var lines = std.mem.tokenize(input, "\n");
+    var lines = std.mem.tokenize(u8, input, "\n");
     const time = try std.fmt.parseInt(usize, lines.next().?, 10);
-    var buses = std.mem.tokenize(lines.next().?, ",");
+    var buses = std.mem.tokenize(u8, lines.next().?, ",");
     var i: usize = 0;
     while (buses.next()) |bus_id_string| {
         const id: ?Answer = std.fmt.parseInt(Answer, bus_id_string, 10) catch {
@@ -104,20 +104,20 @@ fn part2(input: Input) Answer {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day13.txt");
+    const test_input = @embedFile("../inputs/test_day13.txt");
     const input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 295);
-    expect(part2(input) == 1068781);
+    try expect(part1(input) == 295);
+    try expect(part2(input) == 1068781);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day13.txt");
+    const test_input = @embedFile("../inputs/day13.txt");
     const input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 3035);
-    expect(part2(input) == 725169163285238);
+    try expect(part1(input) == 3035);
+    try expect(part2(input) == 725169163285238);
 }

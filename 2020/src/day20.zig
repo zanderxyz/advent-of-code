@@ -1,10 +1,10 @@
 // TODO: Rewrite using a single slice rather than a slice of slices
 
 const std = @import("std");
-const print = std.debug.warn;
+const print = std.log.info;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day20.txt");
+const INPUT_FILE = @embedFile("../inputs/day20.txt");
 
 const N = 10; // Tile width
 
@@ -16,12 +16,12 @@ const monster = [_][]const u8{
 
 const Answer = usize;
 const Tile = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     id: usize,
     data: [][]bool,
     edges: [][]bool,
 
-    fn init(allocator: *std.mem.Allocator, id: usize, data: [][]bool) Tile {
+    fn init(allocator: std.mem.Allocator, id: usize, data: [][]bool) Tile {
         return Tile{
             .allocator = allocator,
             .id = id,
@@ -60,7 +60,7 @@ const Tile = struct {
     fn showRow(edge: []bool) void {
         for (edge) |b| {
             const x: []const u8 = if (b) "#" else ".";
-            print("{}", .{x});
+            print("{s}", .{x});
         }
         print("\n", .{});
     }
@@ -73,7 +73,7 @@ const Tile = struct {
         flipVerticallyData(self.allocator, &self.data);
     }
 
-    fn initEdges(allocator: *std.mem.Allocator, data: [][]bool) [][]bool {
+    fn initEdges(allocator: std.mem.Allocator, data: [][]bool) [][]bool {
         var all = std.ArrayList([]bool).init(allocator);
 
         var top = std.ArrayList(bool).init(allocator);
@@ -85,17 +85,17 @@ const Tile = struct {
         var left2 = std.ArrayList(bool).init(allocator);
         var right2 = std.ArrayList(bool).init(allocator);
 
-        for (data[0]) |col, j| {
+        for (data[0]) |col| {
             top.append(col) catch unreachable;
             top2.append(col) catch unreachable;
         }
-        for (data) |row, i| {
+        for (data) |row| {
             left.append(row[0]) catch unreachable;
             left2.append(row[0]) catch unreachable;
             right.append(row[N - 1]) catch unreachable;
             right2.append(row[N - 1]) catch unreachable;
         }
-        for (data[N - 1]) |col, j| {
+        for (data[N - 1]) |col| {
             bottom.append(col) catch unreachable;
             bottom2.append(col) catch unreachable;
         }
@@ -120,7 +120,7 @@ const Tile = struct {
     fn topEdge(self: Tile) []bool {
         var edge = std.ArrayList(bool).init(self.allocator);
 
-        for (self.data[0]) |col, j| {
+        for (self.data[0]) |col| {
             edge.append(col) catch unreachable;
         }
 
@@ -130,7 +130,7 @@ const Tile = struct {
     fn bottomEdge(self: Tile) []bool {
         var edge = std.ArrayList(bool).init(self.allocator);
 
-        for (self.data[N - 1]) |col, j| {
+        for (self.data[N - 1]) |col| {
             edge.append(col) catch unreachable;
         }
 
@@ -140,7 +140,7 @@ const Tile = struct {
     fn leftEdge(self: Tile) []bool {
         var edge = std.ArrayList(bool).init(self.allocator);
 
-        for (self.data) |row, i| {
+        for (self.data) |row| {
             edge.append(row[0]) catch unreachable;
         }
 
@@ -150,7 +150,7 @@ const Tile = struct {
     fn rightEdge(self: Tile) []bool {
         var edge = std.ArrayList(bool).init(self.allocator);
 
-        for (self.data) |row, i| {
+        for (self.data) |row| {
             edge.append(row[N - 1]) catch unreachable;
         }
 
@@ -214,7 +214,7 @@ const Tile = struct {
     }
 };
 
-fn rotateRightData(allocator: *std.mem.Allocator, data: *[][]bool) void {
+fn rotateRightData(allocator: std.mem.Allocator, data: *[][]bool) void {
     var new = std.ArrayList([]bool).init(allocator);
 
     // Map old (r, c) => new (c, n-r-1)
@@ -236,7 +236,7 @@ fn rotateRightData(allocator: *std.mem.Allocator, data: *[][]bool) void {
     data.* = new.toOwnedSlice();
 }
 
-fn flipVerticallyData(allocator: *std.mem.Allocator, data: *[][]bool) void {
+fn flipVerticallyData(allocator: std.mem.Allocator, data: *[][]bool) void {
     var new = std.ArrayList([]bool).init(allocator);
 
     // Map old (r, c) => new (c, n-r-1)
@@ -256,10 +256,10 @@ fn flipVerticallyData(allocator: *std.mem.Allocator, data: *[][]bool) void {
 }
 
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     tiles: []Tile,
 
-    fn init(allocator: *std.mem.Allocator, tiles: []Tile) Input {
+    fn init(allocator: std.mem.Allocator, tiles: []Tile) Input {
         return Input{
             .allocator = allocator,
             .tiles = tiles,
@@ -276,26 +276,26 @@ const Input = struct {
 
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
-    var arena = std.heap.ArenaAllocator.init(&alloc.allocator);
+    var arena = std.heap.ArenaAllocator.init(alloc.allocator());
     defer arena.deinit();
 
-    var input = try parseInput(&arena.allocator, INPUT_FILE);
+    var input = try parseInput(arena.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input, false)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var tiles = std.ArrayList(Tile).init(allocator);
     errdefer tiles.deinit();
 
-    var groups = std.mem.split(input, "\n\n");
+    var groups = std.mem.split(u8, input, "\n\n");
     while (groups.next()) |group| {
         var tile_data = std.ArrayList([]bool).init(allocator);
         errdefer tile_data.deinit();
 
-        var lines = std.mem.tokenize(group, "\n");
+        var lines = std.mem.tokenize(u8, group, "\n");
         const title_row = lines.next().?;
         const tile_id_str = title_row[5..9];
         const tile_id = try std.fmt.parseInt(usize, tile_id_str, 10);
@@ -348,13 +348,13 @@ const TileMap = std.AutoHashMap(usize, Tile);
 const Links = std.AutoHashMap(usize, []usize);
 
 const Graph = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     tiles: TileMap,
     links: std.AutoHashMap(usize, []usize),
 
     const Self = @This();
 
-    fn init(allocator: *std.mem.Allocator, input: Input) !Self {
+    fn init(allocator: std.mem.Allocator, input: Input) !Self {
         var tiles = TileMap.init(allocator);
         var links = Links.init(allocator);
 
@@ -393,7 +393,6 @@ const Graph = struct {
         var positions = std.AutoHashMap(usize, Position).init(self.allocator);
         defer positions.deinit();
 
-        var iterator = self.links.iterator();
         var corner: usize = switch (is_test) {
             true => 1951,
             false => 2749,
@@ -511,7 +510,7 @@ const Graph = struct {
     fn deinit(self: *Self) void {
         var iterator = self.links.iterator();
         while (iterator.next()) |entry| {
-            self.allocator.free(entry.value);
+            self.allocator.free(entry.value_ptr.*);
         }
         self.tiles.deinit();
         self.links.deinit();
@@ -541,12 +540,12 @@ const Offset = struct {
 };
 
 const Grid = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     grid: [][]?usize,
 
     const Self = @This();
 
-    fn init(allocator: *std.mem.Allocator, input: Input) Self {
+    fn init(allocator: std.mem.Allocator, input: Input) Self {
         const width = @intCast(u32, std.math.sqrt(input.tiles.len));
         var grid = std.ArrayList([]?usize).init(allocator);
         var i: usize = 0;
@@ -591,13 +590,12 @@ const Grid = struct {
 };
 
 const Image = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     data: [][]bool,
 
     const Self = @This();
 
-    fn init(allocator: *std.mem.Allocator, tiles: TileMap, grid: Grid) Self {
-        const grid_width = grid.grid.len;
+    fn init(allocator: std.mem.Allocator, tiles: TileMap, grid: Grid) Self {
         var width = (N - 2) * grid.grid.len;
         var data = std.ArrayList([]bool).init(allocator);
         var i: usize = 0;
@@ -680,8 +678,6 @@ fn part2(input: Input, is_test: bool) Answer {
     var graph = Graph.init(input.allocator, input) catch unreachable;
     defer graph.deinit();
 
-    var iterator = graph.links.iterator();
-
     // Arrange into a grid
     var grid = Grid.init(input.allocator, input);
     defer grid.deinit();
@@ -723,12 +719,12 @@ test "examples" {
     var arena = std.heap.ArenaAllocator.init(alloc);
     defer arena.deinit();
 
-    const test_input = @embedFile("inputs/test_day20.txt");
-    var input = try parseInput(&arena.allocator, test_input);
+    const test_input = @embedFile("../inputs/test_day20.txt");
+    var input = try parseInput(arena.allocator(), test_input);
     defer input.deinit();
 
-    expect(part1(input) == 20899048083289);
-    expect(part2(input, true) == 273);
+    try expect(part1(input) == 20899048083289);
+    try expect(part2(input, true) == 273);
 }
 
 test "answers" {
@@ -736,10 +732,10 @@ test "answers" {
     var arena = std.heap.ArenaAllocator.init(alloc);
     defer arena.deinit();
 
-    const test_input = @embedFile("inputs/day20.txt");
-    var input = try parseInput(&arena.allocator, test_input);
+    const test_input = @embedFile("../inputs/day20.txt");
+    var input = try parseInput(arena.allocator(), test_input);
     defer input.deinit();
 
-    expect(part1(input) == 11788777383197);
-    expect(part2(input, false) == 2242);
+    try expect(part1(input) == 11788777383197);
+    try expect(part2(input, false) == 2242);
 }

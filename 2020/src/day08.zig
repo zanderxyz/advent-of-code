@@ -2,11 +2,11 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("inputs/day08.txt");
+const INPUT_FILE = @embedFile("../inputs/day08.txt");
 
 const Answer = isize;
 const Input = struct {
-    allocator: *std.mem.Allocator,
+    allocator: std.mem.Allocator,
     items: []Instruction,
 
     fn deinit(self: *Input) void {
@@ -57,9 +57,7 @@ const Instruction = struct {
     argument: Answer,
 };
 
-const Operation = enum {
-    nop, acc, jmp
-};
+const Operation = enum { nop, acc, jmp };
 
 const Set = std.AutoHashMap(isize, void);
 
@@ -71,20 +69,20 @@ const Output = union(enum) {
 pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
-    var input = try parseInput(&alloc.allocator, INPUT_FILE);
+    var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
     print("Part 1: {}\n", .{part1(input)});
     print("Part 2: {}\n", .{part2(input)});
 }
 
-fn parseInput(allocator: *std.mem.Allocator, input: []const u8) !Input {
+fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {
     var result = std.ArrayList(Instruction).init(allocator);
     errdefer result.deinit();
 
-    var instructions = std.mem.tokenize(input, "\n");
+    var instructions = std.mem.tokenize(u8, input, "\n");
     while (instructions.next()) |line| {
-        var parts = std.mem.split(line, " ");
+        var parts = std.mem.split(u8, line, " ");
         var operationString = parts.next().?;
         var argumentString = parts.next().?;
 
@@ -145,20 +143,20 @@ fn part2(input: Input) Answer {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/test_day08.txt");
+    const test_input = @embedFile("../inputs/test_day08.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 5);
-    expect(part2(input) == 8);
+    try expect(part1(input) == 5);
+    try expect(part2(input) == 8);
 }
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("inputs/day08.txt");
+    const test_input = @embedFile("../inputs/day08.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
-    expect(part1(input) == 2080);
-    expect(part2(input) == 2477);
+    try expect(part1(input) == 2080);
+    try expect(part2(input) == 2477);
 }
