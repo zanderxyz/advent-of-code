@@ -114,12 +114,12 @@ impl GameState {
     fn progress(&self) -> [GameUpdate; 7] {
         // These are all the possible combinations of three rolls, along with how many universes they occur in
         [
-            self.clone().apply(3, 1),
-            self.clone().apply(4, 3),
-            self.clone().apply(5, 6),
-            self.clone().apply(6, 7),
-            self.clone().apply(7, 6),
-            self.clone().apply(8, 3),
+            self.apply(3, 1),
+            self.apply(4, 3),
+            self.apply(5, 6),
+            self.apply(6, 7),
+            self.apply(7, 6),
+            self.apply(8, 3),
             self.apply(9, 1),
         ]
     }
