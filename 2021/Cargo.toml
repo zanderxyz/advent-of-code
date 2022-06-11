@@ -9,8 +9,8 @@ edition = "2021"
 itertools = "0.10.1"
 lazy_static = "1.4.0"
 num-digitize = "0.4.2"
-rayon = "1.5.1"
-regex = "1.5.4"
+rayon = "1.5.3"
+regex = "1.5.6"
 serde_scan = "0.4.1"
 
 [profile.dev.package."*"]
