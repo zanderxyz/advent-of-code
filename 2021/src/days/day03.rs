@@ -1,5 +1,3 @@
-use num_digitize::FromIterRadix;
-
 const INPUT: &str = include_str!("../../inputs/day03.txt");
 
 #[derive(Clone, Debug)]
@@ -109,9 +107,13 @@ fn filter_numbers<const N: usize>(numbers: Vec<[bool; N]>, more_ones_than_zeros:
 }
 
 fn binary_to_integer<const N: usize>(binary: [bool; N]) -> i64 {
-    let digits = binary.into_iter().map(|b| if b { 1 } else { 0 });
+    let digits = binary.into_iter().map(|b| if b { 1_i64 } else { 0_i64 });
 
-    usize::from_iter_radix(digits, 2)
+    digits.into_iter().fold(0_i64, |mut sum: i64, number| {
+        sum *= 2;
+        sum += number;
+        sum
+    })
 }
 
 pub fn main() {

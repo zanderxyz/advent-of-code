@@ -1,6 +1,7 @@
 use itertools::Itertools;
-use num_digitize::FromDigits;
 use serde_scan::scan;
+
+use crate::helpers::digits::from_digits;
 
 const INPUT: &str = include_str!("../../inputs/day24.txt");
 
@@ -144,7 +145,7 @@ fn part1(input: &Input) -> i64 {
     let variables = get_variables(&input.instructions);
     let processed = process_variables(variables);
 
-    processed
+    let digits = processed
         .into_iter()
         .flat_map(|(left, right, d)| {
             if d > 0 {
@@ -154,15 +155,16 @@ fn part1(input: &Input) -> i64 {
             }
         })
         .sorted()
-        .map(|(_, y)| y)
-        .from_digits()
+        .map(|(_, y)| y);
+
+    from_digits(digits)
 }
 
 fn part2(input: &Input) -> i64 {
     let variables = get_variables(&input.instructions);
     let processed = process_variables(variables);
 
-    processed
+    let digits = processed
         .into_iter()
         .flat_map(|(left, right, d)| {
             if d > 0 {
@@ -172,8 +174,9 @@ fn part2(input: &Input) -> i64 {
             }
         })
         .sorted()
-        .map(|(_, y)| y)
-        .from_digits()
+        .map(|(_, y)| y);
+
+    from_digits(digits)
 }
 
 pub fn main() {

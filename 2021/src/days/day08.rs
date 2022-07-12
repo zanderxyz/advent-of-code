@@ -1,7 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
-use num_digitize::FromDigits;
+
+use crate::helpers::digits::from_digits;
 
 const INPUT: &str = include_str!("../../inputs/day08.txt");
 
@@ -171,12 +172,12 @@ fn part2(input: &Input) -> i64 {
             let uses_of_each_segment = count_uses_of_each_segment(&line.inputs);
 
             // Now we have enough information to decode any digit (but we only bother with the output)
-            score_each_digit(&line.outputs, uses_of_each_segment)
-                .map(|score| {
-                    // This is the same unique score we got earlier, so we can just look it up to find the digit
-                    *digit_scores.get(&score).unwrap()
-                })
-                .from_digits()
+            let digits = score_each_digit(&line.outputs, uses_of_each_segment).map(|score| {
+                // This is the same unique score we got earlier, so we can just look it up to find the digit
+                *digit_scores.get(&score).unwrap() as isize
+            });
+
+            from_digits(digits.into_iter())
         })
         .sum()
 }
