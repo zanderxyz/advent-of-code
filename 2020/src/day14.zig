@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("../inputs/day14.txt");
+const INPUT_FILE = @embedFile("inputs/day14.txt");
 
 const Answer = usize;
 const Address = u36;
@@ -57,7 +57,7 @@ const Memory = struct {
         } else {
             // For every 1 in mask, we want to recursively call this function twice
             // Fetch the smallest bit
-            const least_significant = @as(Address, 1) << @ctz(u36, mask);
+            const least_significant = @as(Address, 1) << @ctz(mask);
 
             // Reduce the mask each time, so eventually we end up with 2^n applications
             const new_mask = mask & ~least_significant;
@@ -182,7 +182,7 @@ fn part2(input: *Input) Answer {
 
 test "example 1" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/test_day14.txt");
+    const test_input = @embedFile("inputs/test_day14.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
@@ -191,7 +191,7 @@ test "example 1" {
 
 test "example 2" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/test_day14_2.txt");
+    const test_input = @embedFile("inputs/test_day14_2.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
@@ -200,7 +200,7 @@ test "example 2" {
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/day14.txt");
+    const test_input = @embedFile("inputs/day14.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 

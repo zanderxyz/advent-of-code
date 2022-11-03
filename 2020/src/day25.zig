@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("../inputs/day25.txt");
+const INPUT_FILE = @embedFile("inputs/day25.txt");
 
 const Answer = usize;
 
@@ -78,14 +78,14 @@ fn part1(input: Input) Answer {
 }
 
 test "examples" {
-    const test_input = @embedFile("../inputs/test_day25.txt");
+    const test_input = @embedFile("inputs/test_day25.txt");
     var input = try parseInput(test_input);
 
     try expect(part1(input) == 14897079);
 }
 
 test "answers" {
-    const test_input = @embedFile("../inputs/day25.txt");
+    const test_input = @embedFile("inputs/day25.txt");
     var input = try parseInput(test_input);
 
     try expect(part1(input) == 9177528);

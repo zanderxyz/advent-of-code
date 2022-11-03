@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("../inputs/day09.txt");
+const INPUT_FILE = @embedFile("inputs/day09.txt");
 
 const Answer = usize;
 const Input = []Answer;
@@ -92,7 +92,7 @@ fn isValid(numbers: []const usize, number: usize) bool {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/test_day09.txt");
+    const test_input = @embedFile("inputs/test_day09.txt");
     const input = try parseInput(alloc, test_input);
     defer alloc.free(input);
 
@@ -103,7 +103,7 @@ test "example" {
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/day09.txt");
+    const test_input = @embedFile("inputs/day09.txt");
     const input = try parseInput(alloc, test_input);
     defer alloc.free(input);
 

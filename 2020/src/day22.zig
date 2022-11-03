@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("../inputs/day22.txt");
+const INPUT_FILE = @embedFile("inputs/day22.txt");
 
 const Answer = usize;
 
@@ -339,7 +339,7 @@ fn part2(input: Input) Answer {
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/test_day22.txt");
+    const test_input = @embedFile("inputs/test_day22.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
@@ -349,7 +349,7 @@ test "examples" {
 
 test "example infinite" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/test_day22_2.txt");
+    const test_input = @embedFile("inputs/test_day22_2.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
@@ -359,7 +359,7 @@ test "example infinite" {
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/day22.txt");
+    const test_input = @embedFile("inputs/day22.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 

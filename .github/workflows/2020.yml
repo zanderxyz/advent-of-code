@@ -25,7 +25,7 @@ jobs:
     - name: Set up Zig
       uses: goto-bus-stop/setup-zig@v1
       with: 
-        version: 0.9.0
+        version: 0.10.0
 
     - name: Day 1
       run: zig test 2020/src/day01.zig

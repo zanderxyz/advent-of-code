@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("../inputs/day15.txt");
+const INPUT_FILE = @embedFile("inputs/day15.txt");
 
 const Answer = usize;
 const LastSeen = std.AutoHashMap(Answer, Answer);
@@ -77,7 +77,7 @@ fn part2(input: Input) Answer {
 
 test "examples" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/test_day15.txt");
+    const test_input = @embedFile("inputs/test_day15.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
@@ -87,7 +87,7 @@ test "examples" {
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/day15.txt");
+    const test_input = @embedFile("inputs/day15.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 

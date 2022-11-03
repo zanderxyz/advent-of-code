@@ -4,7 +4,7 @@ const std = @import("std");
 const print = std.log.info;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("../inputs/day20.txt");
+const INPUT_FILE = @embedFile("inputs/day20.txt");
 
 const N = 10; // Tile width
 
@@ -719,7 +719,7 @@ test "examples" {
     var arena = std.heap.ArenaAllocator.init(alloc);
     defer arena.deinit();
 
-    const test_input = @embedFile("../inputs/test_day20.txt");
+    const test_input = @embedFile("inputs/test_day20.txt");
     var input = try parseInput(arena.allocator(), test_input);
     defer input.deinit();
 
@@ -732,7 +732,7 @@ test "answers" {
     var arena = std.heap.ArenaAllocator.init(alloc);
     defer arena.deinit();
 
-    const test_input = @embedFile("../inputs/day20.txt");
+    const test_input = @embedFile("inputs/day20.txt");
     var input = try parseInput(arena.allocator(), test_input);
     defer input.deinit();
 

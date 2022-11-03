@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("../inputs/day04.txt");
+const INPUT_FILE = @embedFile("inputs/day04.txt");
 const VALID_EYE_COLORS = [_][]const u8{ "amb", "blu", "brn", "gry", "grn", "hzl", "oth" };
 
 const Answer = usize;
@@ -166,7 +166,7 @@ fn part2(input: Input) Answer {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/test_day04.txt");
+    const test_input = @embedFile("inputs/test_day04.txt");
     const input = try parseInput(alloc, test_input);
     defer input.deinit();
 
@@ -175,7 +175,7 @@ test "example" {
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/day04.txt");
+    const test_input = @embedFile("inputs/day04.txt");
     const input = try parseInput(alloc, test_input);
     defer input.deinit();
 

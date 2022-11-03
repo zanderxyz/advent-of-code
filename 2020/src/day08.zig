@@ -2,7 +2,7 @@ const std = @import("std");
 const print = std.debug.warn;
 const expect = std.testing.expect;
 
-const INPUT_FILE = @embedFile("../inputs/day08.txt");
+const INPUT_FILE = @embedFile("inputs/day08.txt");
 
 const Answer = isize;
 const Input = struct {
@@ -143,7 +143,7 @@ fn part2(input: Input) Answer {
 
 test "example" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/test_day08.txt");
+    const test_input = @embedFile("inputs/test_day08.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
@@ -153,7 +153,7 @@ test "example" {
 
 test "answers" {
     var alloc = std.testing.allocator;
-    const test_input = @embedFile("../inputs/day08.txt");
+    const test_input = @embedFile("inputs/day08.txt");
     var input = try parseInput(alloc, test_input);
     defer input.deinit();
 
