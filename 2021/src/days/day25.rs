@@ -42,7 +42,7 @@ fn change_positions(grid: &mut Grid, width: usize, height: usize) -> bool {
     // Move right
     for row in grid.iter_mut() {
         // Check the right hand column first
-        let crossed_boundary = if row[width - 1] == Some(Cucumber::Right) && row[0] == None {
+        let crossed_boundary = if row[width - 1] == Some(Cucumber::Right) && row[0].is_none() {
             row[width - 1] = None;
             row[0] = Some(Cucumber::Right);
             something_moved = true;
@@ -54,7 +54,7 @@ fn change_positions(grid: &mut Grid, width: usize, height: usize) -> bool {
         // If anything crossed over to the LHS, we do not need to check the first column
         let mut col = crossed_boundary;
         while col < width - crossed_boundary - 1usize {
-            if row[col] == Some(Cucumber::Right) && row[col + 1] == None {
+            if row[col] == Some(Cucumber::Right) && row[col + 1].is_none() {
                 row[col + 1] = Some(Cucumber::Right);
                 row[col] = None;
                 col += 1;
@@ -68,7 +68,7 @@ fn change_positions(grid: &mut Grid, width: usize, height: usize) -> bool {
     for col in 0..width {
         // Check the bottom row first
         let crossed_boundary =
-            if grid[height - 1][col] == Some(Cucumber::Down) && grid[0][col] == None {
+            if grid[height - 1][col] == Some(Cucumber::Down) && grid[0][col].is_none() {
                 grid[height - 1][col] = None;
                 grid[0][col] = Some(Cucumber::Down);
                 something_moved = true;
@@ -80,7 +80,7 @@ fn change_positions(grid: &mut Grid, width: usize, height: usize) -> bool {
         // If anything crossed over to the top row, we do not need to check the first row
         let mut row = crossed_boundary;
         while row < height - crossed_boundary - 1 {
-            if grid[row][col] == Some(Cucumber::Down) && grid[row + 1][col] == None {
+            if grid[row][col] == Some(Cucumber::Down) && grid[row + 1][col].is_none() {
                 grid[row + 1][col] = Some(Cucumber::Down);
                 grid[row][col] = None;
                 row += 1;

@@ -78,27 +78,9 @@ impl Op {
             Op::Product => packets.iter().map(|p| p.value()).product(),
             Op::Min => packets.iter().map(|p| p.value()).min().unwrap(),
             Op::Max => packets.iter().map(|p| p.value()).max().unwrap(),
-            Op::Greater => {
-                if packets[0].value() > packets[1].value() {
-                    1
-                } else {
-                    0
-                }
-            }
-            Op::Less => {
-                if packets[0].value() < packets[1].value() {
-                    1
-                } else {
-                    0
-                }
-            }
-            Op::Eq => {
-                if packets[0].value() == packets[1].value() {
-                    1
-                } else {
-                    0
-                }
-            }
+            Op::Greater => usize::from(packets[0].value() > packets[1].value()),
+            Op::Less => usize::from(packets[0].value() < packets[1].value()),
+            Op::Eq => usize::from(packets[0].value() == packets[1].value()),
         }
     }
 }

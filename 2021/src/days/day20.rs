@@ -28,11 +28,7 @@ impl Image {
             // This cell is out of bounds
             return if self.background_black { 0 } else { 1 };
         }
-        if self.data.contains(position) {
-            1
-        } else {
-            0
-        }
+        usize::from(self.data.contains(position))
     }
 
     fn total_capacity(&self) -> usize {

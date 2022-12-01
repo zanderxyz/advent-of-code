@@ -28,7 +28,7 @@ impl FromStr for Action {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (dir_str, dist_str) = s.split_once(" ").expect("Missing whitespace");
+        let (dir_str, dist_str) = s.split_once(' ').expect("Missing whitespace");
 
         let direction = str_to_direction(dir_str).ok_or(ParseError::InvalidDirection)?;
         let distance = dist_str

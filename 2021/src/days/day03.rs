@@ -107,7 +107,7 @@ fn filter_numbers<const N: usize>(numbers: Vec<[bool; N]>, more_ones_than_zeros:
 }
 
 fn binary_to_integer<const N: usize>(binary: [bool; N]) -> i64 {
-    let digits = binary.into_iter().map(|b| if b { 1_i64 } else { 0_i64 });
+    let digits = binary.into_iter().map(i64::from);
 
     digits.into_iter().fold(0_i64, |mut sum: i64, number| {
         sum *= 2;

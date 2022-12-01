@@ -186,25 +186,29 @@ impl<const N: usize> Positions<N> {
             .map(|&index| self.at_index(index))
             .collect();
         if N == 19 {
-            if room_occupants[0] == None && room_occupants[1] == None {
+            if room_occupants[0].is_none() && room_occupants[1].is_none() {
                 // Both are empty, we can move to the end
                 return Some(room_cells[1]);
             }
-            if room_occupants[0] == None && room_occupants[1].unwrap().room_index() == target_room {
+            if room_occupants[0].is_none() && room_occupants[1].unwrap().room_index() == target_room
+            {
                 // Furthest spot is filled, we can move to the near one and complete this room
                 return Some(room_cells[0]);
             }
         } else if N == 27 {
-            if room_occupants[0] == None
-                && room_occupants[1] == None
-                && room_occupants[2] == None
-                && room_occupants[3] == None
+            if room_occupants[0].is_none()
+                && room_occupants[1].is_none()
+                && room_occupants[2].is_none()
+                && room_occupants[3].is_none()
             {
                 // All are empty, we can move to the end
                 return Some(room_cells[3]);
             }
 
-            if room_occupants[0] == None && room_occupants[1] == None && room_occupants[2] == None {
+            if room_occupants[0].is_none()
+                && room_occupants[1].is_none()
+                && room_occupants[2].is_none()
+            {
                 // First three are empty
                 if room_occupants[3].unwrap().room_index() == target_room {
                     // Three are empty and final is complete, we can move to the third
@@ -214,7 +218,7 @@ impl<const N: usize> Positions<N> {
                 }
             }
 
-            if room_occupants[0] == None && room_occupants[1] == None {
+            if room_occupants[0].is_none() && room_occupants[1].is_none() {
                 if room_occupants[2].unwrap().room_index() == target_room
                     && room_occupants[3].unwrap().room_index() == target_room
                 {
@@ -225,7 +229,7 @@ impl<const N: usize> Positions<N> {
                 }
             }
 
-            if room_occupants[0] == None
+            if room_occupants[0].is_none()
                 && room_occupants[1].unwrap().room_index() == target_room
                 && room_occupants[2].unwrap().room_index() == target_room
                 && room_occupants[3].unwrap().room_index() == target_room
@@ -266,7 +270,7 @@ impl<const N: usize> Positions<N> {
     }
 
     fn is_empty_at(&self, index: usize) -> bool {
-        self.at_index(index) == None
+        self.at_index(index).is_none()
     }
 
     fn at_index(&self, i: usize) -> Option<Amphipod> {
