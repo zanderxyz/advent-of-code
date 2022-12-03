@@ -6,11 +6,11 @@ const INPUT: &str = include_str!("../../inputs/day01.txt");
 
 #[derive(Clone)]
 struct Input {
-    pub elves: Vec<Vec<usize>>,
+    elves: Vec<Vec<usize>>,
 }
 
 impl Input {
-    pub fn new(input: &str) -> Input {
+    fn new(input: &str) -> Input {
         let mut elves = Vec::new();
         let mut current_elf: Vec<usize> = Vec::new();
         for line in input.lines() {
@@ -61,14 +61,14 @@ mod tests {
     const TEST_INPUT: &str = include_str!("../../inputs/test_day01.txt");
 
     #[test]
-    pub fn examples() {
+    fn examples() {
         let input = Input::new(TEST_INPUT);
         assert_eq!(part1(&input), 24000);
         assert_eq!(part2(&input), 45000);
     }
 
     #[test]
-    pub fn answers() {
+    fn answers() {
         let input = Input::new(INPUT);
         assert_eq!(part1(&input), 69528);
         assert_eq!(part2(&input), 206152);

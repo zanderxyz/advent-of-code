@@ -6,7 +6,7 @@ const INPUT: &str = include_str!("../../inputs/day02.txt");
 
 #[derive(Clone)]
 struct Input {
-    pub rounds: Vec<RoundInput>,
+    rounds: Vec<RoundInput>,
 }
 
 #[derive(Clone)]
@@ -163,7 +163,7 @@ impl Round {
 }
 
 impl Input {
-    pub fn new(input: &str) -> Input {
+    fn new(input: &str) -> Input {
         Input {
             rounds: input
                 .lines()
@@ -215,14 +215,14 @@ mod tests {
     const TEST_INPUT: &str = include_str!("../../inputs/test_day02.txt");
 
     #[test]
-    pub fn examples() {
+    fn examples() {
         let input = Input::new(TEST_INPUT);
         assert_eq!(part1(&input), 15);
         assert_eq!(part2(&input), 12);
     }
 
     #[test]
-    pub fn answers() {
+    fn answers() {
         let input = Input::new(INPUT);
         assert_eq!(part1(&input), 12679);
         assert_eq!(part2(&input), 14470);
