@@ -408,7 +408,6 @@ mod tests {
 
     fn assert_reduce(input: &str, expected: &str) {
         let mut number = parse(input);
-        println!("{}", number);
         number.reduce();
         assert_eq!(number, parse(expected));
     }
@@ -433,12 +432,7 @@ mod tests {
         let sum = inputs
             .iter()
             .map(|&input| parse(input))
-            .reduce(|a, b| {
-                println!("Adding {} and {}", a, b);
-                let c = a + b;
-                println!("Sum is {}", c);
-                c
-            })
+            .reduce(|a, b| a + b)
             .unwrap();
         assert_eq!(sum, parse(expected));
     }
