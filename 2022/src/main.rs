@@ -13,7 +13,7 @@ fn main() {
         1 => days::day01::main(),
         2 => days::day02::main(),
         3 => days::day03::main(),
-        // 4 => days::day04::main(),
+        4 => days::day04::main(),
         // 5 => days::day05::main(),
         // 6 => days::day06::main(),
         // 7 => days::day07::main(),
