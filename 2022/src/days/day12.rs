@@ -28,11 +28,11 @@ impl Input {
                     .map(|(col, char)| match char {
                         'S' => {
                             start = (row, col);
-                            Height::Start(0)
+                            Height::Start
                         }
                         'E' => {
                             end = (row, col);
-                            Height::End(26)
+                            Height::End
                         }
                         c => Height::Other((c as u8) - b'a'),
                     })
@@ -99,16 +99,16 @@ impl Point {
 
 #[derive(Clone, Debug)]
 enum Height {
-    Start(u8),
-    End(u8),
+    Start,
+    End,
     Other(u8),
 }
 
 impl Height {
     fn value(&self) -> u8 {
         match self {
-            Height::Start(x) => *x,
-            Height::End(x) => *x,
+            Height::Start => 0,
+            Height::End => 26,
             Height::Other(x) => *x,
         }
     }
