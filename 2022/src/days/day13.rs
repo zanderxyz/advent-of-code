@@ -5,7 +5,7 @@ use itertools::Itertools;
 const INPUT: &str = include_str!("../../inputs/day13.txt");
 
 #[derive(Clone, Debug)]
-pub struct Input {
+struct Input {
     pairs: Vec<(Packet, Packet)>,
 }
 
@@ -27,7 +27,7 @@ mod parser {
         IResult, Parser,
     };
 
-    pub fn parse_input(i: &str) -> Input {
+    pub(super) fn parse_input(i: &str) -> Input {
         Input {
             pairs: parse_pairs(i).unwrap().1,
         }

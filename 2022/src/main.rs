@@ -23,7 +23,7 @@ fn main() {
         11 => days::day11::main(),
         12 => days::day12::main(),
         13 => days::day13::main(),
-        // 14 => days::day14::main(),
+        14 => days::day14::main(),
         // 15 => days::day15::main(),
         // 16 => days::day16::main(),
         // 17 => days::day17::main(),
