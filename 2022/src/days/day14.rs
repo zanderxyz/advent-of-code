@@ -8,7 +8,7 @@ use itertools::Itertools;
 const INPUT: &str = include_str!("../../inputs/day14.txt");
 
 #[derive(Clone, Debug)]
-pub struct Input {
+struct Input {
     lines: Vec<Line>,
 }
 
