@@ -114,7 +114,7 @@ jobs:
       - name: Set up Zig
         uses: goto-bus-stop/setup-zig@v1
         with: 
-          version: 0.9.0
+          version: 0.10.0
 
       - name: Check formatting
         run: zig fmt --check 2020/src/*.zig
