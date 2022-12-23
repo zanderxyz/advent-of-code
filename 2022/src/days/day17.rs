@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Display,
-};
+use std::collections::{HashMap, HashSet};
 
 const INPUT: &str = include_str!("../../inputs/day17.txt");
 
@@ -256,33 +253,6 @@ where
 
     fn next_action(&mut self) -> (usize, Action) {
         self.actions.next().unwrap()
-    }
-}
-
-impl<A, B> Display for Tetris<A, B>
-where
-    A: Iterator<Item = (usize, Action)>,
-    B: Iterator<Item = (usize, Block)>,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "Tetris!")?;
-        writeln!(f, "Highest point {}", self.highest_point)?;
-        let mut y2 = 0;
-        while y2 <= self.highest_point {
-            let y = self.highest_point - y2;
-            for x in 0..WIDTH + 2 {
-                if x == 0 || x == WIDTH + 1 {
-                    write!(f, "|")?;
-                } else if self.pixels.contains(&(x - 1, y)) {
-                    write!(f, "#")?;
-                } else {
-                    write!(f, " ")?;
-                }
-            }
-            writeln!(f)?;
-            y2 += 1;
-        }
-        Ok(())
     }
 }
 
