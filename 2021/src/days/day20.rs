@@ -26,7 +26,7 @@ impl Image {
             || position.1 >= self.max_c
         {
             // This cell is out of bounds
-            return if self.background_black { 0 } else { 1 };
+            return usize::from(!self.background_black);
         }
         usize::from(self.data.contains(position))
     }
