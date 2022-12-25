@@ -1,7 +1,4 @@
-use std::{
-    collections::HashSet,
-    ops::Add,
-};
+use std::{collections::HashSet, ops::Add};
 
 const INPUT: &str = include_str!("../../inputs/day24.txt");
 
@@ -70,7 +67,7 @@ impl Grid {
     }
 
     fn is_in_grid(&self, p: &Point) -> bool {
-        ((p.x > 0 && p.y > 0) && (p.x < self.width - 1 && p.y < self.height - 1)) 
+        ((p.x > 0 && p.y > 0) && (p.x < self.width - 1 && p.y < self.height - 1))
             // Ending point
             || (p.x == self.width - 2 && p.y == self.height - 1)
             // Starting point
