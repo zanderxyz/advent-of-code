@@ -20,7 +20,6 @@ impl Input {
 fn find_first_n_unique_items_index(input: &[char], n: usize) -> usize {
     let index = input
         .windows(n)
-        .into_iter()
         .map(|window| window.iter().all_unique())
         .position(|b| b)
         .expect("no run of n unique items found");

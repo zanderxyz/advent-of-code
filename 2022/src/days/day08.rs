@@ -36,7 +36,7 @@ impl Forest {
         dx: isize,
         dy: isize,
     ) -> impl Iterator<Item = Tree> + '_ {
-        (1..).into_iter().map_while(move |step| {
+        (1..).map_while(move |step| {
             let x = i as isize + (dx * step);
             let y = j as isize + (dy * step);
             if x >= 0 && y >= 0 {

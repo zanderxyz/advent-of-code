@@ -53,7 +53,7 @@ impl FromStr for Compartment {
     type Err = Infallible;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let items = s.chars().into_iter().collect();
+        let items = s.chars().collect();
         Ok(Self { items })
     }
 }

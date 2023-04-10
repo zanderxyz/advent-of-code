@@ -20,7 +20,6 @@ impl Input {
         let mut end = (0, 0);
         let points = input
             .lines()
-            .into_iter()
             .enumerate()
             .map(|(row, line)| {
                 line.chars()
