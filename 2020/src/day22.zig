@@ -1,5 +1,5 @@
 const std = @import("std");
-const print = std.debug.warn;
+const print = std.log.info;
 const expect = std.testing.expect;
 
 const INPUT_FILE = @embedFile("inputs/day22.txt");

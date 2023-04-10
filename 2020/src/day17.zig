@@ -1,5 +1,5 @@
 const std = @import("std");
-const print = std.debug.warn;
+const print = std.log.info;
 const expect = std.testing.expect;
 
 const INPUT_FILE = @embedFile("inputs/day17.txt");
@@ -199,8 +199,8 @@ pub fn main() !void {
     var input = try parseInput(alloc.allocator(), INPUT_FILE);
     defer input.deinit();
 
-    print("Part 1: {}\n", .{part1(input)});
-    print("Part 2: {}\n", .{part2(input)});
+    print("Part 1: {!}\n", .{part1(input)});
+    print("Part 2: {!}\n", .{part2(input)});
 }
 
 fn parseInput(allocator: std.mem.Allocator, input: []const u8) !Input {

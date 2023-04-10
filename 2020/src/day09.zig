@@ -1,5 +1,5 @@
 const std = @import("std");
-const print = std.debug.warn;
+const print = std.log.info;
 const expect = std.testing.expect;
 
 const INPUT_FILE = @embedFile("inputs/day09.txt");
@@ -11,7 +11,7 @@ pub fn main() !void {
     var alloc = std.heap.GeneralPurposeAllocator(.{}){};
 
     const input = try parseInput(alloc.allocator(), INPUT_FILE);
-    defer alloc.allocator.free(input);
+    defer alloc.allocator().free(input);
 
     const p1answer = part1(input, 25);
     print("Part 1: {}\n", .{p1answer});
