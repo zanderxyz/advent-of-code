@@ -113,21 +113,19 @@ impl Throw {
 
 impl PartialOrd for Throw {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let ord = if self == other {
-            Ordering::Equal
-        } else if self.beats(other) {
-            Ordering::Greater
-        } else {
-            Ordering::Less
-        };
-
-        Some(ord)
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Throw {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        if self == other {
+            Ordering::Equal
+        } else if self.beats(other) {
+            Ordering::Greater
+        } else {
+            Ordering::Less
+        }
     }
 }
 

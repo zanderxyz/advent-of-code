@@ -54,7 +54,7 @@ impl Input {
             })
             .collect();
 
-        let last_line = input.lines().rev().next().unwrap();
+        let last_line = input.lines().next_back().unwrap();
         let (_, instructions) = parser::parse_instructions(last_line).unwrap();
 
         Input { grid, instructions }

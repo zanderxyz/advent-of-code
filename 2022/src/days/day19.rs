@@ -124,6 +124,10 @@ impl State {
 
     // The highest possible score we can reach from our current state if we build a geode every turn
     fn max_possible_score(&self) -> usize {
+        if self.time_left == 0 {
+            return self.stock(&Material::Geode);
+        }
+
         self.stock(&Material::Geode)
             + self.flow(&Material::Geode) * self.time_left
             + ((self.time_left - 1) * self.time_left) / 2
@@ -173,6 +177,11 @@ impl Blueprint {
         if *target == Material::Geode {
             // We always want to build geodes
             return false;
+        }
+
+        if state.time_left < 2 {
+            // There is no time to build anything else
+            return true;
         }
 
         // We can only spend a certain amount per turn, so we may already have sufficient material, no point generating more

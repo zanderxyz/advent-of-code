@@ -103,31 +103,31 @@ impl Eq for PacketItem {}
 
 impl PartialOrd for Packet {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.data.partial_cmp(&other.data)
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Packet {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        self.data.cmp(&other.data)
     }
 }
 
 impl PartialOrd for PacketItem {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        match (self, other) {
-            (PacketItem::Number(x), PacketItem::Number(y)) => Some(x.cmp(y)),
-            (PacketItem::Number(_), PacketItem::List(y)) => vec![self.clone()].partial_cmp(y),
-            (PacketItem::List(x), PacketItem::Number(_)) => x.partial_cmp(&vec![other.clone()]),
-            // The complex sorting rules for lists are actually the default
-            (PacketItem::List(x), PacketItem::List(y)) => x.partial_cmp(y),
-        }
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for PacketItem {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        match (self, other) {
+            (PacketItem::Number(x), PacketItem::Number(y)) => x.cmp(y),
+            (PacketItem::Number(_), PacketItem::List(y)) => vec![self.clone()].cmp(y),
+            (PacketItem::List(x), PacketItem::Number(_)) => x.cmp(&vec![other.clone()]),
+            // The complex sorting rules for lists are actually the default
+            (PacketItem::List(x), PacketItem::List(y)) => x.cmp(y),
+        }
     }
 }
 
